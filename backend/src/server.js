@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const formRoutes = require("./routes/formRoutes");
+const submissionRoutes = require("./routes/submissionRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/forms", formRoutes);
+app.use("/api/submissions", submissionRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
