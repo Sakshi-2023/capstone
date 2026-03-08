@@ -14,7 +14,12 @@ import {
   Alert,
   Chip,
   CircularProgress,
-  Divider
+  Divider,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
@@ -34,6 +39,46 @@ const BulkImport = () => {
 
   const eventSourceRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Change Role form state
+  const [roleEmail, setRoleEmail] = useState("");
+  const [roleValue, setRoleValue] = useState("");
+  const [roleLoading, setRoleLoading] = useState(false);
+  const [roleResult, setRoleResult] = useState(null); // { severity, message }
+
+  const ALLOWED_ROLES = ["Faculty", "HOD", "Dean", "Director", "Admin"];
+
+  const handleChangeRole = async (e) => {
+    e.preventDefault();
+    setRoleResult(null);
+
+    if (!roleEmail.trim()) {
+      setRoleResult({ severity: "error", message: "Email is required." });
+      return;
+    }
+    if (!roleValue) {
+      setRoleResult({ severity: "error", message: "Please select a new role." });
+      return;
+    }
+
+    setRoleLoading(true);
+    try {
+      const res = await API.patch("/admin/change-role", {
+        email: roleEmail.trim(),
+        role: roleValue
+      });
+      setRoleResult({ severity: "success", message: res.data.message });
+      setRoleEmail("");
+      setRoleValue("");
+    } catch (err) {
+      setRoleResult({
+        severity: "error",
+        message: err.response?.data?.message || "Failed to update role. Please try again."
+      });
+    } finally {
+      setRoleLoading(false);
+    }
+  };
 
   // Verify the current user is an Admin
   useEffect(() => {
@@ -292,6 +337,57 @@ const BulkImport = () => {
               <strong>{summary.total}</strong> rows.
             </Alert>
           </>
+        )}
+      </Paper>
+
+      {/* Change Role section */}
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" fontWeight={600} gutterBottom>
+          Change Role
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Update the role of an existing user by their email address.
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleChangeRole}
+          sx={{ display: "flex", gap: 2, alignItems: "flex-start", flexWrap: "wrap" }}
+        >
+          <TextField
+            label="User Email"
+            type="email"
+            value={roleEmail}
+            onChange={(e) => setRoleEmail(e.target.value)}
+            size="small"
+            sx={{ minWidth: 260 }}
+            disabled={roleLoading}
+            autoComplete="off"
+          />
+          <FormControl size="small" sx={{ minWidth: 180 }} disabled={roleLoading}>
+            <InputLabel>New Role</InputLabel>
+            <Select
+              label="New Role"
+              value={roleValue}
+              onChange={(e) => setRoleValue(e.target.value)}
+            >
+              {ALLOWED_ROLES.map((r) => (
+                <MenuItem key={r} value={r}>{r}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={roleLoading}
+            startIcon={roleLoading ? <CircularProgress size={16} color="inherit" /> : null}
+          >
+            {roleLoading ? "Updating…" : "Confirm"}
+          </Button>
+        </Box>
+        {roleResult && (
+          <Alert severity={roleResult.severity} sx={{ mt: 2 }}>
+            {roleResult.message}
+          </Alert>
         )}
       </Paper>
 

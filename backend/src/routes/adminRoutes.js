@@ -241,4 +241,50 @@ async function processRows(jobId, rows) {
   setTimeout(() => jobs.delete(jobId), 10 * 60 * 1000);
 }
 
+// PATCH /api/admin/change-role
+// Body: { email, role }
+router.patch("/change-role", protect, adminOnly, async (req, res) => {
+  try {
+    const { email, role } = req.body;
+
+    if (!email || !role) {
+      return res.status(400).json({ message: "Both email and role are required" });
+    }
+
+    const normalizedRole = ALLOWED_ROLES.find(
+      (r) => r.toLowerCase() === String(role).trim().toLowerCase()
+    );
+
+    if (!normalizedRole) {
+      return res.status(400).json({
+        message: `Invalid role "${role}". Allowed values: ${ALLOWED_ROLES.join(", ")}`
+      });
+    }
+
+    const user = await User.findOne({ email: String(email).toLowerCase().trim() });
+    if (!user) {
+      return res.status(404).json({ message: `No user found with email "${email}"` });
+    }
+
+    if (user.role === normalizedRole) {
+      return res.status(400).json({
+        message: `User already has the role "${normalizedRole}"`
+      });
+    }
+
+    user.role = normalizedRole;
+    await user.save();
+
+    res.json({
+      message: `Role updated to "${normalizedRole}" for ${user.email}`,
+      user: { name: user.name, email: user.email, role: user.role }
+    });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      return res.status(400).json({ message: err.message });
+    }
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
