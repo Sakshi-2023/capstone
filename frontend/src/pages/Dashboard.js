@@ -62,6 +62,12 @@ const Dashboard = () => {
             Generate PDF
           </Button>
 
+          {user && user.role === "Admin" && (
+            <Button variant="contained" color="secondary" onClick={() => navigate("/admin/bulk-import")}>
+              Bulk Import Users
+            </Button>
+          )}
+
           <Button variant="outlined" onClick={handleLogout}>
             Logout
           </Button>

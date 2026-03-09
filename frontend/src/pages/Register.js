@@ -3,10 +3,11 @@ import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: ""
   });
@@ -18,15 +19,13 @@ const Login = () => {
     });
   };
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const res = await API.post("/auth/login", form);
-
-      localStorage.setItem("token", res.data.token);
-
-      navigate("/dashboard");
+      await API.post("/auth/register", form);
+      alert("Registration successful! Please login.");
+      navigate("/");
     } catch (err) {
-      alert("Invalid credentials");
+      alert(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -41,8 +40,16 @@ const Login = () => {
         }}
       >
         <Typography variant="h4" align="center">
-          Login
+          Register
         </Typography>
+
+        <TextField
+          label="Name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          fullWidth
+        />
 
         <TextField
           label="Email"
@@ -61,20 +68,16 @@ const Login = () => {
           fullWidth
         />
 
-        <Button variant="contained" onClick={handleLogin}>
-          Login
+        <Button variant="contained" onClick={handleRegister}>
+          Register
         </Button>
 
         <Typography variant="body2" align="center">
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </Typography>
-
-        <Typography variant="body2" align="center">
-          Don't have an account? <Link to="/register">Register</Link>
+          Already have an account? <Link to="/">Login</Link>
         </Typography>
       </Box>
     </Container>
   );
 };
 
-export default Login;
+export default Register;

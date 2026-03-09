@@ -1,0 +1,13 @@
+services:
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5100:5100"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

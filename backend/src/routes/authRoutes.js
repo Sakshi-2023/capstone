@@ -4,15 +4,44 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const PDFDocument = require("pdfkit");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const nm = require("nodemailer");
 const protect = require("../middleware/authMiddleware");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const router = express.Router();
+const allowedRoles = ["Faculty", "HOD", "Dean", "Director"];
+
+const transporter = nm.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER ,
+        pass: process.env.EMAIL_PASS ,
+      },
+    });
 
 // REGISTER
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required" });
+    }
+
+    const normalizedRole = role
+      ? allowedRoles.find((allowedRole) => allowedRole.toLowerCase() === String(role).toLowerCase())
+      : undefined;
+
+    if (role && !normalizedRole) {
+      return res.status(400).json({
+        message: "Invalid role",
+        allowedRoles
+      });
+    }
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -27,7 +56,7 @@ router.post("/register", async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role
+      role: normalizedRole || undefined
     });
 
     res.status(201).json({
@@ -35,6 +64,10 @@ router.post("/register", async (req, res) => {
     });
 
   } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
+
     res.status(500).json({ message: "Server Error", error });
   }
 });
@@ -138,12 +171,32 @@ router.post("/forgot-password", async (req, res) => {
 
     const resetURL = `http://localhost:3000/reset/${resetToken}`;
 
+    if (!transporter) {
+      return res.json({
+        message: "Password reset link generated",
+        resetURL,
+        emailSent: false
+      });
+    }
+
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Password Reset Request",
+      html: `<p>You requested a password reset. Click <a href="${resetURL}">here</a> to reset your password.</p>`
+    });
+
     res.json({
-      message: "Password reset link generated (Demo mode)",
-      resetURL
+      message: "Password reset email sent",
+      emailSent: true
     });
 
   } catch (error) {
+    if (error.code === "EAUTH") {
+      return res.status(500).json({
+        message: "Email service authentication failed. Gmail rejected the configured credentials.",
+      });
+    }
+
     res.status(500).json({ message: "Server Error", error });
   }
 });
