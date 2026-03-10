@@ -57,18 +57,42 @@ const Dashboard = () => {
           </>
         )}
 
-        <Box sx={{ marginTop: 2, display: "flex", gap: 2 }}>
-          <Button variant="contained" onClick={generatePDF}>
-            Generate PDF
-          </Button>
-
-          {user && user.role === "Admin" && (
-            <Button variant="contained" color="secondary" onClick={() => navigate("/admin/bulk-import")}>
-              Bulk Import Users
+        <Box sx={{ marginTop: 3, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            <Button variant="contained" onClick={generatePDF}>
+              Download Profile PDF
             </Button>
-          )}
 
-          <Button variant="outlined" onClick={handleLogout}>
+            <Button variant="outlined" onClick={() => navigate("/forms")}>
+              Fill a Form
+            </Button>
+
+            <Button variant="outlined" onClick={() => navigate("/submissions")}>
+              My Submissions
+            </Button>
+
+            {user && ["HOD", "Dean", "Director", "Admin"].includes(user.role) && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => navigate("/approvals")}
+              >
+                Approvals
+              </Button>
+            )}
+
+            {user && user.role === "Admin" && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => navigate("/admin/bulk-import")}
+              >
+                Bulk Import Users
+              </Button>
+            )}
+          </Box>
+
+          <Button variant="text" color="error" onClick={handleLogout}>
             Logout
           </Button>
         </Box>
