@@ -10,9 +10,9 @@ const fieldSchema = new mongoose.Schema({
     required: true,
   },
   type: {
-    type: String,
-    enum: ["text", "number", "date", "textarea", "select"],
-    default: "text",
+  type: String,
+  enum: ["text", "number", "date", "textarea", "select", "radio"],
+  default: "text",
   },
   required: {
     type: Boolean,
@@ -36,6 +36,12 @@ const formTemplateSchema = new mongoose.Schema(
       default: "",
     },
     fields: [fieldSchema],
+    // Ordered list of roles that must approve this form.
+    // Example: ["HOD", "Dean", "Director"] or ["HOD"] etc.
+    approvalStages: {
+      type: [String],
+      default: [],
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
