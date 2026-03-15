@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "2.4.3",
+    "cors": "2.8.5",
+    "csv-parse": "5.5.6",
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "jsonwebtoken": "9.0.2",
+    "mongoose": "7.6.0",
+    "multer": "2.1.1",
+    "nodemailer": "6.9.7",
+    "pdfkit": "0.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "description": "",
+  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
+}
