@@ -162,6 +162,7 @@ const forgotPassword = async (req, res) => {
     }
 
     await transporter.sendMail({
+      from: `"IIT Patna Forms Portal" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Password Reset Request – IIT Patna Forms Portal",
       html: `<p>You requested a password reset for the IIT Patna Forms Portal. Click <a href="${resetURL}">here</a> to reset your password. This link expires in 15 minutes.</p>`,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, Container } from "@mui/material";
+import { TextField, Button, Box } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
@@ -13,10 +13,11 @@ const ResetPassword = () => {
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleResetPassword = async () => {
@@ -38,31 +39,29 @@ const ResetPassword = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 5 }}>
-        <TextField
-          label="New Password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          fullWidth
-        />
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <TextField
+        label="New Password"
+        name="password"
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+        fullWidth
+      />
 
-        <TextField
-          label="Confirm New Password"
-          name="confirmPassword"
-          type="password"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          fullWidth
-        />
+      <TextField
+        label="Confirm New Password"
+        name="confirmPassword"
+        type="password"
+        value={form.confirmPassword}
+        onChange={handleChange}
+        fullWidth
+      />
 
-        <Button variant="contained" onClick={handleResetPassword}>
-          Update Password
-        </Button>
-      </Box>
-    </Container>
+      <Button variant="contained" size="large" onClick={handleResetPassword} fullWidth sx={{ py: 1.25 }}>
+        Update Password
+      </Button>
+    </Box>
   );
 };
 
