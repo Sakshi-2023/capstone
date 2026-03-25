@@ -13,9 +13,17 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import API from "../services/api";
+import IITPFormHeader from "../components/IITPFormHeader";
+import { FORM_PAGE_SETTINGS } from "../config/formUiSettings";
 
 const FormFill = () => {
   const { templateId } = useParams();
@@ -51,7 +59,7 @@ const FormFill = () => {
           }
           (found.fields || []).forEach((f) => {
             if (!(f.name in initial)) {
-              initial[f.name] = "";
+              initial[f.name] = f.type === "table" ? [] : "";
             }
           });
           setValues(initial);
@@ -67,6 +75,32 @@ const FormFill = () => {
 
   const handleChange = (name) => (e) => {
     setValues((prev) => ({ ...prev, [name]: e.target.value }));
+  };
+
+  const addTableRow = (field) => {
+    const cols = Array.isArray(field.columns) ? field.columns : [];
+    const emptyRow = cols.reduce((acc, col) => ({ ...acc, [col]: "" }), {});
+    setValues((prev) => {
+      const current = Array.isArray(prev[field.name]) ? prev[field.name] : [];
+      return { ...prev, [field.name]: [...current, emptyRow] };
+    });
+  };
+
+  const updateTableCell = (fieldName, rowIndex, column, value) => {
+    setValues((prev) => {
+      const rows = Array.isArray(prev[fieldName]) ? [...prev[fieldName]] : [];
+      if (!rows[rowIndex]) rows[rowIndex] = {};
+      rows[rowIndex] = { ...rows[rowIndex], [column]: value };
+      return { ...prev, [fieldName]: rows };
+    });
+  };
+
+  const deleteTableRow = (fieldName, rowIndex) => {
+    setValues((prev) => {
+      const rows = Array.isArray(prev[fieldName]) ? [...prev[fieldName]] : [];
+      rows.splice(rowIndex, 1);
+      return { ...prev, [fieldName]: rows };
+    });
   };
 
   const handleSubmit = async () => {
@@ -115,7 +149,7 @@ const FormFill = () => {
   }
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md" sx={{ pl: FORM_PAGE_SETTINGS.leftPadding, pr: FORM_PAGE_SETTINGS.rightPadding }}>
       <Box sx={{ mt: 4, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="h5" fontWeight={600}>
           {template.title}
@@ -125,9 +159,10 @@ const FormFill = () => {
         </Button>
       </Box>
 
-      <Paper sx={{ p: 3 }}>
+      <Paper sx={{ p: 2.5 }}>
+        <IITPFormHeader />
         {template.description && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: FORM_PAGE_SETTINGS.compactSpacing, mt: 1.2 }}>
             {template.description}
           </Typography>
         )}
@@ -138,7 +173,7 @@ const FormFill = () => {
           // Radio group (yes/no, male/female, etc.)
           if (field.type === "radio") {
             return (
-              <Box key={field.name} sx={{ mt: 2 }}>
+              <Box key={field.name} sx={{ mt: FORM_PAGE_SETTINGS.compactSpacing }}>
                 <FormControl component="fieldset" required={field.required}>
                   <FormLabel component="legend">{field.label}</FormLabel>
                   <RadioGroup
@@ -206,6 +241,60 @@ const FormFill = () => {
                 type="date"
                 InputLabelProps={{ shrink: true }}
               />
+            );
+          }
+
+          if (field.type === "table") {
+            const rows = Array.isArray(values[field.name]) ? values[field.name] : [];
+            const columns = Array.isArray(field.columns) ? field.columns : [];
+            return (
+              <Box key={field.name} sx={{ mt: FORM_PAGE_SETTINGS.compactSpacing }}>
+                <Typography variant="subtitle2" sx={{ mb: 0.8 }}>
+                  {field.label}
+                </Typography>
+                <TableContainer component={Paper} variant="outlined">
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        {columns.map((col) => (
+                          <TableCell key={col}>{col}</TableCell>
+                        ))}
+                        <TableCell width={80}>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row, rowIndex) => (
+                        <TableRow key={`${field.name}-${rowIndex}`}>
+                          {columns.map((col) => (
+                            <TableCell key={`${field.name}-${rowIndex}-${col}`}>
+                              <TextField
+                                size="small"
+                                fullWidth
+                                value={row[col] || ""}
+                                onChange={(e) =>
+                                  updateTableCell(field.name, rowIndex, col, e.target.value)
+                                }
+                              />
+                            </TableCell>
+                          ))}
+                          <TableCell>
+                            <Button
+                              color="error"
+                              size="small"
+                              onClick={() => deleteTableRow(field.name, rowIndex)}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Button sx={{ mt: 1 }} variant="outlined" onClick={() => addTableRow(field)}>
+                  Add Row
+                </Button>
+              </Box>
             );
           }
 

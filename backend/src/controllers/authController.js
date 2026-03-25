@@ -6,6 +6,7 @@ const PDFDocument = require("pdfkit");
 const User = require("../models/User");
 
 const ALLOWED_ROLES = ["Faculty", "HOD", "Dean", "Director"];
+const ALLOWED_EMAIL_DOMAIN = "@iitp.ac.in";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -26,6 +27,11 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "Name, email, and password are required" });
     }
 
+    const normalizedEmail = String(email).toLowerCase().trim();
+    if (!normalizedEmail.endsWith(ALLOWED_EMAIL_DOMAIN)) {
+      return res.status(400).json({ message: "Only @iitp.ac.in email addresses are allowed" });
+    }
+
     const normalizedRole = role
       ? ALLOWED_ROLES.find((r) => r.toLowerCase() === String(role).toLowerCase())
       : undefined;
@@ -34,7 +40,7 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "Invalid role", allowedRoles: ALLOWED_ROLES });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -42,7 +48,7 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       role: normalizedRole || undefined,
     });
@@ -59,8 +65,12 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = String(email || "").toLowerCase().trim();
+    if (!normalizedEmail.endsWith(ALLOWED_EMAIL_DOMAIN)) {
+      return res.status(400).json({ message: "Use your institute @iitp.ac.in email" });
+    }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }

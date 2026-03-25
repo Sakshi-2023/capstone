@@ -2,6 +2,185 @@ const FormSubmission = require("../models/FormSubmission");
 const FormTemplate = require("../models/FormTemplate");
 const User = require("../models/User");
 const PDFDocument = require("pdfkit");
+const { PDFDocument: PDFLibDocument, StandardFonts, rgb } = require("pdf-lib");
+const fs = require("fs");
+const path = require("path");
+const {
+  PDF_PAGE_SETTINGS,
+  PDF_HEADER_SETTINGS,
+} = require("../config/pdfSettings");
+const {
+  PDF_TEMPLATE_MAPPINGS,
+  TEMPLATE_FOLDER_PATH,
+} = require("../config/pdfTemplateMappings");
+
+const getSubmissionValue = (responses, key) => {
+  if (!responses) return undefined;
+  if (typeof responses.get === "function") return responses.get(key);
+  return responses[key];
+};
+
+const renderPdfHeader = (doc) => {
+  const startY = doc.y;
+  if (fs.existsSync(PDF_HEADER_SETTINGS.logoPath)) {
+    doc.image(PDF_HEADER_SETTINGS.logoPath, PDF_PAGE_SETTINGS.leftMargin, startY, {
+      width: PDF_HEADER_SETTINGS.logoWidth,
+    });
+  }
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(15)
+    .text(PDF_HEADER_SETTINGS.instituteNameEnglish, PDF_PAGE_SETTINGS.leftMargin + 62, startY, {
+      width: doc.page.width - PDF_PAGE_SETTINGS.leftMargin - PDF_PAGE_SETTINGS.rightMargin - 62,
+      align: "left",
+    });
+
+  const hindiFontAvailable = fs.existsSync(PDF_HEADER_SETTINGS.hindiFontPath);
+  if (hindiFontAvailable) {
+    doc.registerFont(
+      PDF_HEADER_SETTINGS.hindiFontName,
+      PDF_HEADER_SETTINGS.hindiFontPath
+    );
+  }
+
+  doc
+    .font(hindiFontAvailable ? PDF_HEADER_SETTINGS.hindiFontName : "Helvetica")
+    .fontSize(12)
+    .text(PDF_HEADER_SETTINGS.instituteNameHindi, PDF_PAGE_SETTINGS.leftMargin + 62, doc.y + 2, {
+      width: doc.page.width - PDF_PAGE_SETTINGS.leftMargin - PDF_PAGE_SETTINGS.rightMargin - 62,
+      align: "left",
+    });
+
+  doc
+    .font("Helvetica")
+    .fontSize(10)
+    .text(PDF_HEADER_SETTINGS.subtitle, PDF_PAGE_SETTINGS.leftMargin + 62, doc.y + 2);
+
+  doc.y = Math.max(doc.y + 6, startY + 56);
+  doc
+    .moveTo(PDF_PAGE_SETTINGS.leftMargin, doc.y)
+    .lineTo(doc.page.width - PDF_PAGE_SETTINGS.rightMargin, doc.y)
+    .stroke();
+  doc.moveDown(0.8);
+};
+
+const renderTableField = (doc, fieldLabel, columns, rows) => {
+  doc.font("Helvetica-Bold").fontSize(13).text(fieldLabel);
+  doc.moveDown(0.25);
+
+  const safeColumns = Array.isArray(columns) && columns.length > 0 ? columns : ["Column 1"];
+  const safeRows = Array.isArray(rows) ? rows : [];
+
+  doc.font("Helvetica-Bold").fontSize(10).text(safeColumns.join(" | "));
+  doc.moveDown(0.2);
+  doc.font("Helvetica").fontSize(9);
+
+  if (safeRows.length === 0) {
+    doc.text("-");
+    doc.moveDown(0.4);
+    return;
+  }
+
+  safeRows.forEach((row, idx) => {
+    const rendered = safeColumns.map((col) => (row && row[col] ? String(row[col]) : "-"));
+    doc.text(`${idx + 1}. ${rendered.join(" | ")}`);
+  });
+  doc.moveDown(0.5);
+};
+
+const fitTextToWidth = (text, font, size, maxWidth) => {
+  if (!maxWidth) return text;
+  let output = String(text);
+  while (output.length > 0 && font.widthOfTextAtSize(output, size) > maxWidth) {
+    output = output.slice(0, -1);
+  }
+  return output;
+};
+
+const drawPdfLibText = (page, text, x, y, options = {}) => {
+  if (!text) return;
+  const size = options.size || 9;
+  const font = options.font;
+  const maxWidth = options.maxWidth;
+  const renderedText =
+    font && maxWidth ? fitTextToWidth(String(text), font, size, maxWidth) : String(text);
+  page.drawText(renderedText, {
+    x,
+    y,
+    size,
+    color: rgb(0, 0, 0),
+    maxWidth,
+  });
+};
+
+const yFromTop = (pageHeight, yTop, fontSize = 11) => {
+  return pageHeight - yTop;
+};
+
+const generateOriginalTemplatePdf = async (submission) => {
+  const templateTitle = submission?.template?.title;
+  if (!templateTitle || !PDF_TEMPLATE_MAPPINGS[templateTitle]) return null;
+
+  const mapping = PDF_TEMPLATE_MAPPINGS[templateTitle];
+  const templatePath = path.join(TEMPLATE_FOLDER_PATH, mapping.fileName);
+  if (!fs.existsSync(templatePath)) return null;
+
+  const sourceBytes = fs.readFileSync(templatePath);
+  const pdfDoc = await PDFLibDocument.load(sourceBytes);
+  const pages = pdfDoc.getPages();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  Object.entries(mapping.fields || {}).forEach(([key, meta]) => {
+    const page = pages[meta.page];
+    if (!page) return;
+    const pageHeight = page.getHeight();
+    const value = getSubmissionValue(submission.responses, key);
+    if (value === undefined || value === null || value === "") return;
+
+    page.setFont(font);
+    const y = yFromTop(pageHeight, meta.yTop, meta.size);
+
+    drawPdfLibText(
+      page,
+      String(value),
+      meta.x,
+      yFromTop(pageHeight, meta.yTop, meta.size),
+      {
+        size: meta.size || 11,
+        maxWidth: meta.maxWidth,
+        font,
+      }
+    );
+  });
+
+  Object.entries(mapping.tableFields || {}).forEach(([key, tableMeta]) => {
+    const page = pages[tableMeta.page];
+    if (!page) return;
+    const pageHeight = page.getHeight();
+    const rows = getSubmissionValue(submission.responses, key);
+    if (!Array.isArray(rows)) return;
+
+    rows.slice(0, 10).forEach((row, rowIndex) => {
+      let currentX = tableMeta.startX;
+      tableMeta.columns.forEach((col) => {
+        const cellValue = row && row[col.key] ? String(row[col.key]) : "";
+        page.setFont(font);
+        drawPdfLibText(
+          page,
+          cellValue,
+          currentX,
+          yFromTop(pageHeight, tableMeta.startYTop + rowIndex * tableMeta.rowHeight),
+          { size: 8, maxWidth: col.width - 4, font }
+        );
+        currentX += col.width;
+      });
+    });
+  });
+
+  const filledBytes = await pdfDoc.save();
+  return Buffer.from(filledBytes);
+};
 
 // @desc Submit a form
 // Body: { templateId, responses, parentSubmissionId? }
@@ -218,7 +397,25 @@ const generateSubmissionPDF = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to download" });
     }
 
-    const doc = new PDFDocument({ margin: 50 });
+    const originalTemplatePdf = await generateOriginalTemplatePdf(submission);
+    if (originalTemplatePdf) {
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=form-${submission._id}.pdf`
+      );
+      return res.send(originalTemplatePdf);
+    }
+
+    const doc = new PDFDocument({
+      size: "A4",
+      margins: {
+        left: PDF_PAGE_SETTINGS.leftMargin,
+        right: PDF_PAGE_SETTINGS.rightMargin,
+        top: PDF_PAGE_SETTINGS.topMargin,
+        bottom: PDF_PAGE_SETTINGS.bottomMargin,
+      },
+    });
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
@@ -228,21 +425,7 @@ const generateSubmissionPDF = async (req, res) => {
 
     doc.pipe(res);
 
-    // Header (logo placeholder + institute title)
-    doc
-      .fontSize(22)
-      .font("Helvetica-Bold")
-      .text("Indian Institute of Technology Patna", { align: "center" });
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text("Online Forms Portal", { align: "center" });
-    doc.moveDown(0.5);
-    doc
-      .moveTo(50, doc.y)
-      .lineTo(doc.page.width - 50, doc.y)
-      .stroke();
-    doc.moveDown(1);
+    renderPdfHeader(doc);
 
     doc
       .fontSize(16)
@@ -265,7 +448,11 @@ const generateSubmissionPDF = async (req, res) => {
 
     const fields = submission.template.fields || [];
     fields.forEach((field) => {
-      const value = submission.responses.get(field.name);
+      const value = getSubmissionValue(submission.responses, field.name);
+      if (field.type === "table") {
+        renderTableField(doc, field.label, field.columns, value);
+        return;
+      }
       doc
         .font("Helvetica-Bold")
         .text(`${field.label}: `, { continued: true });

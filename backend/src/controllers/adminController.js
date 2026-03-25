@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const User = require("../models/User");
 
 const ALLOWED_ROLES = ["Faculty", "HOD", "Dean", "Director", "Admin"];
+const ALLOWED_EMAIL_DOMAIN = "@iitp.ac.in";
 const jobs = new Map();
 
 // @desc Bulk import users from CSV
@@ -140,6 +141,9 @@ async function processRows(jobId, rows) {
 
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new Error("Invalid email format");
+      }
+      if (!String(email).toLowerCase().trim().endsWith(ALLOWED_EMAIL_DOMAIN)) {
+        throw new Error("Only @iitp.ac.in emails are allowed");
       }
 
       if (password.length < 6) {

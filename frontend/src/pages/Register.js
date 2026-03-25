@@ -42,6 +42,7 @@ const Register = () => {
         <TextField
           label="Email"
           name="email"
+          helperText="Use institute email (example@iitp.ac.in)"
           value={form.email}
           onChange={handleChange}
           fullWidth

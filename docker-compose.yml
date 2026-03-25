@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7
+    image: mongo:7.0.12
     container_name: mongo-db
     ports:
       - "27017:27017"
@@ -17,6 +17,17 @@ services:
       - "5100:5100"
     depends_on:
       - mongodb
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5100/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     networks:
       - app-network
 

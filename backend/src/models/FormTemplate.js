@@ -11,7 +11,7 @@ const fieldSchema = new mongoose.Schema({
   },
   type: {
   type: String,
-  enum: ["text", "number", "date", "textarea", "select", "radio"],
+  enum: ["text", "number", "date", "textarea", "select", "radio", "table"],
   default: "text",
   },
   required: {
@@ -19,6 +19,10 @@ const fieldSchema = new mongoose.Schema({
     default: false,
   },
   options: {
+    type: [String],
+    default: [],
+  },
+  columns: {
     type: [String],
     default: [],
   },

@@ -1,0 +1,49 @@
+{
+  "templates": [
+    {
+      "title": "General Administration Self Declaration Form",
+      "description": "Declaration form for employee background declaration.",
+      "approvalStages": ["Faculty", "HOD"],
+      "fields": [
+        { "label": "Name (Dr./Mr./Ms.)", "name": "employeeName", "type": "text", "required": true },
+        { "label": "Designation", "name": "designation", "type": "text", "required": true },
+        { "label": "Department/Section/Centre", "name": "departmentSectionCentre", "type": "text", "required": true },
+        { "label": "Employee Signature Name", "name": "signatureName", "type": "text", "required": true },
+        { "label": "Employee Number", "name": "employeeNumber", "type": "text", "required": true },
+        { "label": "Place", "name": "place", "type": "text", "required": true },
+        { "label": "Date", "name": "declarationDate", "type": "date", "required": true }
+      ]
+    },
+    {
+      "title": "Medical Claim Form (OPD Treatment)",
+      "description": "Medical reimbursement claim form for OPD treatment.",
+      "approvalStages": ["Faculty", "HOD", "Dean", "Director"],
+      "fields": [
+        { "label": "Claimant Name", "name": "claimantName", "type": "text", "required": true },
+        { "label": "Designation & Employee Number", "name": "designationAndEmpNo", "type": "text", "required": true },
+        { "label": "Department/Section", "name": "claimantDepartment", "type": "text", "required": true },
+        { "label": "Pay", "name": "pay", "type": "text", "required": false },
+        { "label": "P.P. / Special Pay", "name": "specialPay", "type": "text", "required": false },
+        { "label": "Residential Address", "name": "residentialAddress", "type": "textarea", "required": true },
+        { "label": "Patient Name & Relationship", "name": "patientNameRelationship", "type": "text", "required": true },
+        { "label": "Illness", "name": "illness", "type": "text", "required": true },
+        { "label": "Since when ill & place", "name": "illnessSinceAndPlace", "type": "text", "required": true },
+        { "label": "Consultation Date", "name": "consultationDate", "type": "date", "required": false },
+        { "label": "Fee per Consultation", "name": "consultationFee", "type": "number", "required": false },
+        { "label": "Medical Officer Name & Designation", "name": "medicalOfficerName", "type": "text", "required": false },
+        { "label": "Hospital/Dispensary Attached", "name": "hospitalAttached", "type": "text", "required": false },
+        { "label": "Consulted At", "name": "consultedAt", "type": "select", "required": false, "options": ["Hospital", "Consulting Room", "Residence"] },
+        { "label": "No. of Cash Memos", "name": "cashMemosCount", "type": "number", "required": false },
+        { "label": "Total Amount Claimed", "name": "totalAmountClaimed", "type": "number", "required": true },
+        { "label": "Total Enclosures", "name": "totalEnclosures", "type": "number", "required": false },
+        {
+          "label": "Medicines",
+          "name": "medicines",
+          "type": "table",
+          "required": false,
+          "columns": ["Medicine Name", "Price (Rs.)"]
+        }
+      ]
+    }
+  ]
+}
