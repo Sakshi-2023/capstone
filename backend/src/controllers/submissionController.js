@@ -2,6 +2,10 @@ const FormSubmission = require("../models/FormSubmission");
 const FormTemplate = require("../models/FormTemplate");
 const User = require("../models/User");
 const PDFDocument = require("pdfkit");
+const { renderGenAdminPdf } = require("../forms/genadmin/pdfGenerator");
+const { getResponseValue } = require("../utils/pdfUtils");
+
+const GEN_ADMIN_TEMPLATE_CODE = "gen-admin";
 
 // @desc Submit a form
 // Body: { templateId, responses, parentSubmissionId? }
@@ -64,7 +68,7 @@ const getMySubmissions = async (req, res) => {
     const submissions = await FormSubmission.find({
       submittedBy: req.user.id,
     })
-      .populate("template", "title description approvalStages")
+      .populate("template", "title description approvalStages code")
       .sort({ createdAt: -1 });
 
     res.json(submissions);
@@ -200,7 +204,7 @@ const actOnSubmission = async (req, res) => {
 const generateSubmissionPDF = async (req, res) => {
   try {
     const submission = await FormSubmission.findById(req.params.id)
-      .populate("template", "title fields")
+      .populate("template", "title fields code")
       .populate("submittedBy", "name email role");
 
     if (!submission) {
@@ -218,7 +222,9 @@ const generateSubmissionPDF = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to download" });
     }
 
-    const doc = new PDFDocument({ margin: 50 });
+    const isGenAdmin =
+      submission.template && submission.template.code === GEN_ADMIN_TEMPLATE_CODE;
+    const doc = new PDFDocument({ margin: isGenAdmin ? 70 : 50, size: "A4" });
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
@@ -228,52 +234,58 @@ const generateSubmissionPDF = async (req, res) => {
 
     doc.pipe(res);
 
-    // Header (logo placeholder + institute title)
-    doc
-      .fontSize(22)
-      .font("Helvetica-Bold")
-      .text("Indian Institute of Technology Patna", { align: "center" });
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text("Online Forms Portal", { align: "center" });
-    doc.moveDown(0.5);
-    doc
-      .moveTo(50, doc.y)
-      .lineTo(doc.page.width - 50, doc.y)
-      .stroke();
-    doc.moveDown(1);
-
-    doc
-      .fontSize(16)
-      .font("Helvetica-Bold")
-      .text(submission.template.title || "Form Submission", {
-        align: "center",
-      });
-    doc.moveDown();
-
-    doc.fontSize(10).font("Helvetica");
-    doc.text(`Submitted by: ${submission.submittedBy.name}`);
-    doc.text(`Email: ${submission.submittedBy.email}`);
-    doc.text(`Role: ${submission.submittedBy.role}`);
-    doc.text(`Submitted at: ${submission.createdAt.toLocaleString()}`);
-    doc.text(`Status: ${submission.status}`);
-    doc.moveDown();
-
-    doc.fontSize(12).font("Helvetica-Bold").text("Responses", { underline: true });
-    doc.moveDown(0.5);
-
-    const fields = submission.template.fields || [];
-    fields.forEach((field) => {
-      const value = submission.responses.get(field.name);
+    if (isGenAdmin) {
+      renderGenAdminPdf(doc, submission);
+    } else {
+      // Header (logo placeholder + institute title)
       doc
+        .fontSize(22)
         .font("Helvetica-Bold")
-        .text(`${field.label}: `, { continued: true });
-      doc.font("Helvetica").text(
-        value !== undefined && value !== null ? String(value) : "-"
-      );
-      doc.moveDown(0.3);
-    });
+        .text("Indian Institute of Technology Patna", { align: "center" });
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .text("Online Forms Portal", { align: "center" });
+      doc.moveDown(0.5);
+      doc
+        .moveTo(50, doc.y)
+        .lineTo(doc.page.width - 50, doc.y)
+        .stroke();
+      doc.moveDown(1);
+
+      doc
+        .fontSize(16)
+        .font("Helvetica-Bold")
+        .text(submission.template.title || "Form Submission", {
+          align: "center",
+        });
+      doc.moveDown();
+
+      doc.fontSize(10).font("Helvetica");
+      doc.text(`Submitted by: ${submission.submittedBy.name}`);
+      doc.text(`Email: ${submission.submittedBy.email}`);
+      doc.text(`Role: ${submission.submittedBy.role}`);
+      doc.text(`Submitted at: ${submission.createdAt.toLocaleString()}`);
+      doc.text(`Status: ${submission.status}`);
+      doc.moveDown();
+
+      doc.fontSize(12).font("Helvetica-Bold").text("Responses", { underline: true });
+      doc.moveDown(0.5);
+
+      const fields = submission.template.fields || [];
+      fields.forEach((field) => {
+        const value = getResponseValue(submission.responses, field.name);
+        doc
+          .font("Helvetica-Bold")
+          .text(`${field.label}: `, { continued: true });
+        doc.font("Helvetica").text(
+          value !== undefined && value !== null && String(value).trim() !== ""
+            ? String(value)
+            : "-"
+        );
+        doc.moveDown(0.3);
+      });
+    }
 
     if (submission.approvals && submission.approvals.length > 0) {
       doc.moveDown();

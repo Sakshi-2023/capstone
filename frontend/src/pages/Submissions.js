@@ -70,7 +70,12 @@ const Submissions = () => {
       });
     }
 
-    navigate(`/forms/${submission.template._id}/fill`, {
+    // Route to hardcoded form page if template has a code, otherwise use dynamic form filler
+    const targetPath = submission.template?.code
+      ? `/forms/${submission.template.code}`
+      : `/forms/${submission.template._id}/fill`;
+
+    navigate(targetPath, {
       state: {
         prefill,
         parentSubmissionId: submission._id,

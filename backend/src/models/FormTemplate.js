@@ -26,6 +26,12 @@ const fieldSchema = new mongoose.Schema({
 
 const formTemplateSchema = new mongoose.Schema(
   {
+    code: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
     title: {
       type: String,
       required: true,

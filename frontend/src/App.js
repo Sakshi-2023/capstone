@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import BulkImport from "./pages/BulkImport";
 import Forms from "./pages/Forms";
 import FormFill from "./pages/FormFill";
+import GenAdminForm from "./forms/genadmin/GenAdminForm";  // self declaration form 
 import Submissions from "./pages/Submissions";
 import Approvals from "./pages/Approvals";
 import PrivateRoute from "./components/PrivateRoute";
@@ -48,6 +49,26 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <Forms />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/general-administration-self-declaration"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <GenAdminForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/gen-admin"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <GenAdminForm />
               </Layout>
             </PrivateRoute>
           }
