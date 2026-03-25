@@ -116,6 +116,14 @@ const FormFill = () => {
 
   return (
     <Container maxWidth="sm">
+      <Box sx={{ mt: 3, display: "flex", alignItems: "center", gap: 1.25 }}>
+        <Box
+          component="img"
+          src="/iitp.jpg"
+          alt="IITP logo"
+          sx={{ width: 46, height: 46, objectFit: "contain", borderRadius: 1 }}
+        />
+      </Box>
       <Box sx={{ mt: 4, mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="h5" fontWeight={600}>
           {template.title}

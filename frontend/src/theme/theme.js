@@ -1,6 +1,8 @@
 import { createTheme } from "@mui/material/styles";
 
 // College-appropriate palette: deep blue primary, teal accent
+const formFont = '"IBM Plex Sans", "Segoe UI", Roboto, sans-serif';
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -21,7 +23,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"IBM Plex Sans", "Segoe UI", Roboto, sans-serif',
+    fontFamily: formFont,
     h4: {
       fontWeight: 600,
       letterSpacing: "-0.02em",
@@ -61,6 +63,76 @@ const theme = createTheme({
       defaultProps: {
         variant: "outlined",
         size: "medium",
+        fullWidth: true,
+      },
+    },
+    MuiFormControl: {
+      defaultProps: {
+        margin: "normal",
+        fullWidth: true,
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontFamily: formFont,
+          fontWeight: 500,
+          fontSize: "0.95rem",
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          fontFamily: formFont,
+          fontWeight: 600,
+          fontSize: "0.95rem",
+          color: "#1f2937",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 10,
+          minHeight: 46,
+          backgroundColor: "#ffffff",
+          "& input": {
+            fontFamily: formFont,
+            fontSize: "0.95rem",
+            fontWeight: 400,
+            lineHeight: 1.4,
+          },
+          "& textarea": {
+            fontFamily: formFont,
+            fontSize: "0.95rem",
+            lineHeight: 1.5,
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          fontFamily: formFont,
+          fontSize: "0.95rem",
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          fontFamily: formFont,
+          fontSize: "0.95rem",
+        },
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          fontFamily: formFont,
+          fontSize: "0.82rem",
+        },
       },
     },
     MuiChip: {

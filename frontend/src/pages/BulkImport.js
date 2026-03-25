@@ -358,12 +358,11 @@ const BulkImport = () => {
             type="email"
             value={roleEmail}
             onChange={(e) => setRoleEmail(e.target.value)}
-            size="small"
             sx={{ minWidth: 260 }}
             disabled={roleLoading}
             autoComplete="off"
           />
-          <FormControl size="small" sx={{ minWidth: 180 }} disabled={roleLoading}>
+          <FormControl sx={{ minWidth: 180 }} disabled={roleLoading}>
             <InputLabel>New Role</InputLabel>
             <Select
               label="New Role"

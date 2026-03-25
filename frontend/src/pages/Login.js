@@ -39,7 +39,6 @@ const Login = () => {
         value={form.email}
         onChange={handleChange}
         fullWidth
-        size="medium"
       />
       <TextField
         label="Password"

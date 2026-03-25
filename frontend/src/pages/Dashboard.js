@@ -47,6 +47,17 @@ const Dashboard = () => {
   return (
     <Container maxWidth="sm">
       <Box sx={{ marginTop: 5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
+          <Box
+            component="img"
+            src="/iitp.jpg"
+            alt="IITP logo"
+            sx={{ width: 52, height: 52, objectFit: "contain", borderRadius: 1 }}
+          />
+          <Typography variant="subtitle1" color="text.secondary" fontWeight={600}>
+            IIT Patna
+          </Typography>
+        </Box>
         <Typography variant="h4">Dashboard</Typography>
 
         {user && (
