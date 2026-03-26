@@ -30,7 +30,14 @@ const resolveSection = (template) => {
   if (code === "gen-admin" || section === "genadmin" || section === "gen-admin") return "genAdmin";
   if (section.includes("fac") || code.includes("faculty")) return "fac";
   if (section.includes("student") || code.includes("student")) return "snp";
-  if (section.includes("computer") || code.includes("computer")) return "cc";
+  if (
+    section === "cc" ||
+    section.includes("computer") ||
+    code.includes("computer") ||
+    code.startsWith("cc-")
+  ) {
+    return "cc";
+  }
   if (section.includes("finance") || code.includes("finance")) return "fin";
   if (section.includes("establishment") || code.includes("establishment")) return "estb";
   if (section.includes("security") || code.includes("security")) return "security";
@@ -185,4 +192,3 @@ const Forms = () => {
 };
 
 export default Forms;
-

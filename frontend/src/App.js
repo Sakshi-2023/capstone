@@ -10,6 +10,7 @@ import Forms from "./pages/Forms";
 import FormFill from "./pages/FormFill";
 import GenAdminForm from "./forms/genadmin/GenAdminForm";  // self declaration form 
 import SecurityCampusLeavePermissionForFemaleStudents from "./forms/security/SecurityCampusLeavePermissionForFemaleStudents";
+import ComputerCenterLdapAccountRequestForm from "./forms/cc/ComputerCenterLdapAccountRequestForm";
 import Submissions from "./pages/Submissions";
 import Approvals from "./pages/Approvals";
 import PrivateRoute from "./components/PrivateRoute";
@@ -80,6 +81,26 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <SecurityCampusLeavePermissionForFemaleStudents />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-ldap-account-request"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterLdapAccountRequestForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/computer_center_for_requesting_ldap_account_creation_of_project_staff__temporary_staff_1733997767"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterLdapAccountRequestForm />
               </Layout>
             </PrivateRoute>
           }

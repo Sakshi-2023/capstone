@@ -2,6 +2,7 @@ const FormTemplate = require("../models/FormTemplate");
 
 const GEN_ADMIN_TEMPLATE_CODE = "gen-admin";
 const SECURITY_CAMPUS_LEAVE_FEMALE_CODE = "security-campus-leave-female";
+const CC_LDAP_ACCOUNT_REQUEST_CODE = "cc-ldap-account-request";
 
 const SECURITY_CAMPUS_LEAVE_FEMALE_TEMPLATE = {
   code: SECURITY_CAMPUS_LEAVE_FEMALE_CODE,
@@ -19,6 +20,25 @@ const SECURITY_CAMPUS_LEAVE_FEMALE_TEMPLATE = {
     { label: "Companion 1 Roll No", name: "companion1RollNo", type: "text", required: false },
     { label: "Companion 2 Name", name: "companion2Name", type: "text", required: false },
     { label: "Companion 2 Roll No", name: "companion2RollNo", type: "text", required: false },
+  ],
+  approvalStages: [],
+};
+
+const CC_LDAP_ACCOUNT_REQUEST_TEMPLATE = {
+  code: CC_LDAP_ACCOUNT_REQUEST_CODE,
+  title: "REQUEST / REQUISITION FORM (For LDAP Account)",
+  description: "Computer Center request/requisition form for LDAP account creation (project staff/temporary staff).",
+  section: "cc",
+  fields: [
+    { label: "Emp. ID/Project ID", name: "empIdProjectId", type: "text", required: true },
+    { label: "Full Name", name: "fullName", type: "text", required: true },
+    { label: "Dept./Section/Centre", name: "department", type: "text", required: true },
+    { label: "Phone/Mobile No.", name: "phoneMobileNo", type: "text", required: true },
+    { label: "Personal Email-ID", name: "personalEmailId", type: "text", required: true },
+    { label: "Address", name: "address", type: "textarea", required: true },
+    { label: "IITP Email id (If any)", name: "iitpEmailId", type: "text", required: false },
+    { label: "Validity date / Last Date for LDAP account", name: "validityLastDate", type: "date", required: true },
+    { label: "Date", name: "requestDate", type: "date", required: true },
   ],
   approvalStages: [],
 };
@@ -69,6 +89,24 @@ const getSecurityCampusLeaveTemplate = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Failed to load security campus leave template" });
+  }
+};
+
+const getComputerCenterLdapAccountRequestTemplate = async (req, res) => {
+  try {
+    let template = await FormTemplate.findOne({ code: CC_LDAP_ACCOUNT_REQUEST_CODE });
+
+    if (!template) {
+      template = await FormTemplate.create({
+        ...CC_LDAP_ACCOUNT_REQUEST_TEMPLATE,
+        createdBy: req.user.id,
+      });
+    }
+
+    return res.json(template);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to load computer center LDAP account request template" });
   }
 };
 
@@ -130,6 +168,15 @@ const getAllTemplates = async (req, res) => {
       });
     }
 
+    // Ensure Computer Center LDAP account request template exists
+    let ccLdapTemplate = await FormTemplate.findOne({ code: CC_LDAP_ACCOUNT_REQUEST_CODE });
+    if (!ccLdapTemplate) {
+      await FormTemplate.create({
+        ...CC_LDAP_ACCOUNT_REQUEST_TEMPLATE,
+        createdBy: req.user?.id || null,
+      });
+    }
+
     const templates = await FormTemplate.find()
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
@@ -160,4 +207,5 @@ module.exports = {
   getMyTemplates,
   getGenAdminTemplate,
   getSecurityCampusLeaveTemplate,
+  getComputerCenterLdapAccountRequestTemplate,
 };
