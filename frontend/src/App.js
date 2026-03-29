@@ -12,6 +12,10 @@ import GenAdminForm from "./forms/genadmin/GenAdminForm";  // self declaration f
 import VehicleRequisitionForTransportForm from "./forms/genadmin/VehicleRequisitionForTransportForm";
 import SecurityCampusLeavePermissionForFemaleStudents from "./forms/security/SecurityCampusLeavePermissionForFemaleStudents";
 import ComputerCenterLdapAccountRequestForm from "./forms/cc/ComputerCenterLdapAccountRequestForm";
+import ComputerCenterFacultyPerformaForm from "./forms/cc/ComputerCenterFacultyPerformaForm";
+import ComputerCenterFacultyDeclarationForm from "./forms/cc/ComputerCenterFacultyDeclarationForm";
+import ComputerCenterEmailAccountRequestForm from "./forms/cc/ComputerCenterEmailAccountRequestForm";
+import ComputerCenterProxyLdapAccountRequestForm from "./forms/cc/ComputerCenterProxyLdapAccountRequestForm";
 import FinanceProcurementRecommendationSanctionForm from "./forms/fin/RecommendationCumSanctionSheetForPurchaseDoubleBidInrForm";
 import Submissions from "./pages/Submissions";
 import Approvals from "./pages/Approvals";
@@ -123,6 +127,46 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <ComputerCenterLdapAccountRequestForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-faculty-performa"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterFacultyPerformaForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-faculty-declaration"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterFacultyDeclarationForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-email-account-request"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterEmailAccountRequestForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-proxy-ldap-request"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterProxyLdapAccountRequestForm />
               </Layout>
             </PrivateRoute>
           }

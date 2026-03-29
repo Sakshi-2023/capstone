@@ -36,8 +36,6 @@ const resolveSection = (template) => {
   ) {
     return "genAdmin";
   }
-  if (section.includes("fac") || code.includes("faculty")) return "fac";
-  if (section.includes("student") || code.includes("student")) return "snp";
   if (
     section === "cc" ||
     section.includes("computer") ||
@@ -46,6 +44,7 @@ const resolveSection = (template) => {
   ) {
     return "cc";
   }
+  if (section.includes("student") || code.includes("student")) return "snp";
   if (section === "fin" || section.includes("finance") || code.includes("finance")) return "fin";
   if (section.includes("establishment") || code.includes("establishment")) return "estb";
   if (section.includes("security") || code.includes("security")) return "security";

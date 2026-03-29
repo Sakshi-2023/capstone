@@ -5,6 +5,10 @@ const GEN_ADMIN_VEHICLE_REQUISITION_CODE = "gen-admin-vehicle-requisition-transp
 const SECURITY_CAMPUS_LEAVE_FEMALE_CODE = "security-campus-leave-female";
 const CC_LDAP_ACCOUNT_REQUEST_CODE = "cc-ldap-account-request";
 const FINANCE_PROCUREMENT_RECOMMENDATION_SANCTION_CODE = "finance-procurement-recommendation-sanction-double-bid-inr";
+const CC_FACULTY_PERFORMA_CODE = "cc-faculty-performa";
+const CC_FACULTY_DECLARATION_CODE = "cc-faculty-declaration";
+const CC_EMAIL_ACCOUNT_REQUEST_CODE = "cc-email-account-request";
+const CC_PROXY_LDAP_REQUEST_CODE = "cc-proxy-ldap-request";
 
 const GEN_ADMIN_TEMPLATE = {
   code: GEN_ADMIN_TEMPLATE_CODE,
@@ -178,6 +182,106 @@ const FINANCE_PROCUREMENT_RECOMMENDATION_SANCTION_TEMPLATE = {
   approvalStages: [],
 };
 
+const CC_FACULTY_PERFORMA_TEMPLATE = {
+  code: CC_FACULTY_PERFORMA_CODE,
+  title: "Computer Center Faculty Performa Form",
+  description: "Computer Center faculty performa form for web page.",
+  section: "cc",
+  fields: [
+    { label: "Name", name: "name", type: "text", required: true },
+    { label: "Photograph", name: "photograph", type: "file", required: false },
+    { label: "Designation", name: "designation", type: "text", required: true },
+    { label: "Department", name: "department", type: "text", required: true },
+    { label: "Highest Academic Qualification", name: "highestAcademicQualification", type: "textarea", required: false },
+    { label: "Phone (Office)", name: "phoneOffice", type: "text", required: false },
+    { label: "IITP Email id", name: "iitpEmailId", type: "email", required: false },
+    { label: "Personal Webpage", name: "personalWebpage", type: "text", required: false },
+    { label: "Research Areas/Areas of Interest", name: "researchAreas", type: "textarea", required: false },
+    { label: "Other Interests", name: "otherInterests", type: "textarea", required: false },
+    { label: "Courses taught at IITP", name: "coursesTaught", type: "textarea", required: false },
+    { label: "No. of PhD Students", name: "noOfPhDStudents", type: "text", required: false },
+    { label: "Professional Experience", name: "professionalExperience", type: "textarea", required: false },
+    { label: "Awards & Honours", name: "awardsHonours", type: "textarea", required: false },
+    { label: "Member of Professional bodies", name: "memberOfProfessionalBodies", type: "textarea", required: false },
+    { label: "Books", name: "books", type: "textarea", required: false },
+    { label: "Publications", name: "publications", type: "textarea", required: false },
+    { label: "Presentations", name: "presentations", type: "textarea", required: false },
+  ],
+  approvalStages: [],
+};
+
+const CC_FACULTY_DECLARATION_TEMPLATE = {
+  code: CC_FACULTY_DECLARATION_CODE,
+  title: "IIT Patna Website Faculty Declaration Form",
+  description: "Computer Center faculty declaration form for website access.",
+  section: "cc",
+  fields: [
+    { label: "Faculty Name", name: "facultyName", type: "text", required: true },
+    { label: "Employee No", name: "employeeNo", type: "text", required: true },
+    { label: "Designation", name: "designation", type: "text", required: true },
+    { label: "Department", name: "department", type: "text", required: true },
+    { label: "Faculty Signature", name: "facultySignature", type: "text", required: true },
+    { label: "Date", name: "date", type: "date", required: true },
+  ],
+  approvalStages: [],
+};
+
+const CC_EMAIL_ACCOUNT_REQUEST_TEMPLATE = {
+  code: CC_EMAIL_ACCOUNT_REQUEST_CODE,
+  title: "Computer Center Email Account Request Form",
+  description: "Computer Center request form for new email account creation.",
+  section: "cc",
+  fields: [
+    { label: "User Type", name: "userType", type: "radio", required: true, options: ["faculty", "staff", "projectStaff", "student"] },
+    { label: "Date", name: "date", type: "date", required: false },
+    { label: "Emp. ID/Roll No./Project ID", name: "empIdRollNoProjectId", type: "text", required: true },
+    { label: "Name", name: "name", type: "text", required: true },
+    { label: "Existing Email", name: "existingEmail", type: "email", required: false },
+    { label: "Mobile No", name: "mobileNo", type: "text", required: false },
+    { label: "Department", name: "department", type: "text", required: true },
+    { label: "Ph. No", name: "phNo", type: "text", required: false },
+    { label: "Block", name: "block", type: "text", required: false },
+    { label: "Floor", name: "floor", type: "text", required: false },
+    { label: "Room No", name: "roomNo", type: "text", required: false },
+    { label: "Preferred Email Id", name: "preferredEmailId", type: "text", required: false },
+    { label: "Email Domain", name: "emailDomain", type: "radio", required: false, options: ["@iitp.ac.in"] },
+    { label: "Proxy Account", name: "proxyAccount", type: "text", required: false },
+    { label: "Days Limit for trainee/conference", name: "daysLimit", type: "text", required: false },
+    { label: "Signature of the Employee/Student", name: "signature", type: "text", required: true },
+    { label: "Forwarding Authority Name", name: "forwardingAuthorityName", type: "text", required: false },
+    { label: "Forwarding Authority Designation", name: "forwardingAuthorityDesignation", type: "text", required: false },
+    { label: "Forwarding Authority Signature", name: "forwardingAuthoritySignature", type: "text", required: false },
+  ],
+  approvalStages: [],
+};
+
+const CC_PROXY_LDAP_REQUEST_TEMPLATE = {
+  code: CC_PROXY_LDAP_REQUEST_CODE,
+  title: "Computer Center Proxy LDAP Request Form",
+  description: "Computer Center request form for proxy LDAP account for trainees/interns.",
+  section: "cc",
+  fields: [
+    { label: "Student Name", name: "studentName", type: "text", required: true },
+    { label: "Student Roll No", name: "studentRollNo", type: "text", required: true },
+    { label: "Institute/Organization/College Name", name: "instituteName", type: "text", required: true },
+    { label: "Email", name: "email", type: "email", required: true },
+    { label: "Mobile No", name: "mobileNo", type: "text", required: true },
+    { label: "Department", name: "department", type: "text", required: true },
+    { label: "Ph. No", name: "phNo", type: "text", required: false },
+    { label: "Address", name: "address", type: "textarea", required: true },
+    { label: "Proxy Account", name: "proxyAccount", type: "text", required: true },
+    { label: "Last day date", name: "lastDayDate", type: "date", required: true },
+    { label: "Guide Name", name: "guideName", type: "text", required: true },
+    { label: "Guide Designation", name: "guideDesignation", type: "text", required: true },
+    { label: "Guide Department", name: "guideDepartment", type: "text", required: true },
+    { label: "Date", name: "date", type: "date", required: true },
+    { label: "Place", name: "place", type: "text", required: true },
+    { label: "Student Signature", name: "studentSignature", type: "text", required: true },
+    { label: "Guide Signature", name: "guideSignature", type: "text", required: true },
+  ],
+  approvalStages: [],
+};
+
 const getGenAdminTemplate = async (req, res) => {
   try {
     let template = await FormTemplate.findOne({ code: GEN_ADMIN_TEMPLATE_CODE });
@@ -277,6 +381,78 @@ const getFinanceProcurementRecommendationSanctionTemplate = async (req, res) => 
   }
 };
 
+const getComputerCenterFacultyPerformaTemplate = async (req, res) => {
+  try {
+    let template = await FormTemplate.findOne({ code: CC_FACULTY_PERFORMA_CODE });
+
+    if (!template) {
+      template = await FormTemplate.create({
+        ...CC_FACULTY_PERFORMA_TEMPLATE,
+        createdBy: req.user.id,
+      });
+    }
+
+    return res.json(template);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to load computer center faculty performa template" });
+  }
+};
+
+const getComputerCenterFacultyDeclarationTemplate = async (req, res) => {
+  try {
+    let template = await FormTemplate.findOne({ code: CC_FACULTY_DECLARATION_CODE });
+
+    if (!template) {
+      template = await FormTemplate.create({
+        ...CC_FACULTY_DECLARATION_TEMPLATE,
+        createdBy: req.user.id,
+      });
+    }
+
+    return res.json(template);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to load computer center faculty declaration template" });
+  }
+};
+
+const getComputerCenterEmailAccountRequestTemplate = async (req, res) => {
+  try {
+    let template = await FormTemplate.findOne({ code: CC_EMAIL_ACCOUNT_REQUEST_CODE });
+
+    if (!template) {
+      template = await FormTemplate.create({
+        ...CC_EMAIL_ACCOUNT_REQUEST_TEMPLATE,
+        createdBy: req.user.id,
+      });
+    }
+
+    return res.json(template);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to load computer center email account request template" });
+  }
+};
+
+const getComputerCenterProxyLdapRequestTemplate = async (req, res) => {
+  try {
+    let template = await FormTemplate.findOne({ code: CC_PROXY_LDAP_REQUEST_CODE });
+
+    if (!template) {
+      template = await FormTemplate.create({
+        ...CC_PROXY_LDAP_REQUEST_TEMPLATE,
+        createdBy: req.user.id,
+      });
+    }
+
+    return res.json(template);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to load computer center proxy LDAP request template" });
+  }
+};
+
 // @desc Create new form template
 const createTemplate = async (req, res) => {
   try {
@@ -351,6 +527,42 @@ const getAllTemplates = async (req, res) => {
       });
     }
 
+    // Ensure Computer Center Faculty Performa template exists
+    let ccFacultyPerformaTemplate = await FormTemplate.findOne({ code: CC_FACULTY_PERFORMA_CODE });
+    if (!ccFacultyPerformaTemplate) {
+      await FormTemplate.create({
+        ...CC_FACULTY_PERFORMA_TEMPLATE,
+        createdBy: req.user?.id || null,
+      });
+    }
+
+    // Ensure Computer Center Faculty Declaration template exists
+    let ccFacultyDeclarationTemplate = await FormTemplate.findOne({ code: CC_FACULTY_DECLARATION_CODE });
+    if (!ccFacultyDeclarationTemplate) {
+      await FormTemplate.create({
+        ...CC_FACULTY_DECLARATION_TEMPLATE,
+        createdBy: req.user?.id || null,
+      });
+    }
+
+    // Ensure Computer Center Email Account Request template exists
+    let ccEmailAccountRequestTemplate = await FormTemplate.findOne({ code: CC_EMAIL_ACCOUNT_REQUEST_CODE });
+    if (!ccEmailAccountRequestTemplate) {
+      await FormTemplate.create({
+        ...CC_EMAIL_ACCOUNT_REQUEST_TEMPLATE,
+        createdBy: req.user?.id || null,
+      });
+    }
+
+    // Ensure Computer Center Proxy LDAP Request template exists
+    let ccProxyLdapRequestTemplate = await FormTemplate.findOne({ code: CC_PROXY_LDAP_REQUEST_CODE });
+    if (!ccProxyLdapRequestTemplate) {
+      await FormTemplate.create({
+        ...CC_PROXY_LDAP_REQUEST_TEMPLATE,
+        createdBy: req.user?.id || null,
+      });
+    }
+
     const templates = await FormTemplate.find()
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
@@ -384,4 +596,8 @@ module.exports = {
   getSecurityCampusLeaveTemplate,
   getComputerCenterLdapAccountRequestTemplate,
   getFinanceProcurementRecommendationSanctionTemplate,
+  getComputerCenterFacultyPerformaTemplate,
+  getComputerCenterFacultyDeclarationTemplate,
+  getComputerCenterEmailAccountRequestTemplate,
+  getComputerCenterProxyLdapRequestTemplate,
 };

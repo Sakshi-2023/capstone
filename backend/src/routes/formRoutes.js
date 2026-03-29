@@ -8,6 +8,10 @@ const {
   getSecurityCampusLeaveTemplate,
   getComputerCenterLdapAccountRequestTemplate,
   getFinanceProcurementRecommendationSanctionTemplate,
+  getComputerCenterFacultyPerformaTemplate,
+  getComputerCenterFacultyDeclarationTemplate,
+  getComputerCenterEmailAccountRequestTemplate,
+  getComputerCenterProxyLdapRequestTemplate,
 } = require("../controllers/formController");
 
 const protect = require("../middleware/authMiddleware");
@@ -45,5 +49,17 @@ router.get(
   protect,
   getFinanceProcurementRecommendationSanctionTemplate
 );
+
+// Computer Center - Faculty Performa Form
+router.get("/computer-center-faculty-performa/template", protect, getComputerCenterFacultyPerformaTemplate);
+
+// Computer Center - Faculty Declaration Form
+router.get("/computer-center-faculty-declaration/template", protect, getComputerCenterFacultyDeclarationTemplate);
+
+// Computer Center - Email Account Request Form
+router.get("/computer-center-email-account-request/template", protect, getComputerCenterEmailAccountRequestTemplate);
+
+// Computer Center - Proxy LDAP Request Form
+router.get("/computer-center-proxy-ldap-request/template", protect, getComputerCenterProxyLdapRequestTemplate);
 
 module.exports = router;

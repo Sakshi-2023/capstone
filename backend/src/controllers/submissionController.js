@@ -7,6 +7,10 @@ const { renderGenAdminVehicleRequisitionPdf } = require("../forms/genadmin/Vehic
 const { renderSecurityCampusLeavePermissionForFemaleStudentsPdf } = require("../forms/security/SecurityCampusLeavePermissionForFemaleStudents");
 const { renderComputerCenterRequestingLdapAccountPdf } = require("../forms/cc/ComputerCenterRequestingLdapAccountCreationOfProjectStaffTemporaryStaff");
 const { renderFinanceProcurementRecommendationSanctionPdf } = require("../forms/fin/RecommendationCumSanctionSheetForPurchaseDoubleBidInr");
+const { renderComputerCenterFacultyPerformaPdf } = require("../forms/cc/ComputerCenterFacultyPerformaForm");
+const { renderComputerCenterFacultyDeclarationPdf } = require("../forms/cc/ComputerCenterFacultyDeclarationForm");
+const { renderComputerCenterEmailAccountRequestPdf } = require("../forms/cc/ComputerCenterEmailAccountRequestForm");
+const { renderComputerCenterProxyLdapAccountRequestPdf } = require("../forms/cc/ComputerCenterProxyLdapAccountRequestForm");
 const { getResponseValue } = require("../utils/pdfUtils");
 
 const GEN_ADMIN_TEMPLATE_CODE = "gen-admin";
@@ -14,6 +18,10 @@ const GEN_ADMIN_VEHICLE_REQUISITION_CODE = "gen-admin-vehicle-requisition-transp
 const SECURITY_CAMPUS_LEAVE_FEMALE_CODE = "security-campus-leave-female";
 const CC_LDAP_ACCOUNT_REQUEST_CODE = "cc-ldap-account-request";
 const FINANCE_PROCUREMENT_RECOMMENDATION_SANCTION_CODE = "finance-procurement-recommendation-sanction-double-bid-inr";
+const CC_FACULTY_PERFORMA_CODE = "cc-faculty-performa";
+const CC_FACULTY_DECLARATION_CODE = "cc-faculty-declaration";
+const CC_EMAIL_ACCOUNT_REQUEST_CODE = "cc-email-account-request";
+const CC_PROXY_LDAP_REQUEST_CODE = "cc-proxy-ldap-request";
 
 // @desc Submit a form
 // Body: { templateId, responses, parentSubmissionId? }
@@ -237,6 +245,10 @@ const generateSubmissionPDF = async (req, res) => {
     const isComputerCenterLdapRequest = templateCode === CC_LDAP_ACCOUNT_REQUEST_CODE;
     const isFinanceProcurementRecommendationSanction =
       templateCode === FINANCE_PROCUREMENT_RECOMMENDATION_SANCTION_CODE;
+    const isComputerCenterFacultyPerforma = templateCode === CC_FACULTY_PERFORMA_CODE;
+    const isComputerCenterFacultyDeclaration = templateCode === CC_FACULTY_DECLARATION_CODE;
+    const isComputerCenterEmailAccountRequest = templateCode === CC_EMAIL_ACCOUNT_REQUEST_CODE;
+    const isComputerCenterProxyLdapRequest = templateCode === CC_PROXY_LDAP_REQUEST_CODE;
     const doc = new PDFDocument({
       margin: isGenAdmin ? 70 : isGenAdminVehicleRequisition ? 52 : isFinanceProcurementRecommendationSanction ? 45 : 50,
       size: "A4",
@@ -260,6 +272,14 @@ const generateSubmissionPDF = async (req, res) => {
       renderComputerCenterRequestingLdapAccountPdf(doc, submission);
     } else if (isFinanceProcurementRecommendationSanction) {
       renderFinanceProcurementRecommendationSanctionPdf(doc, submission);
+    } else if (isComputerCenterFacultyPerforma) {
+      renderComputerCenterFacultyPerformaPdf(doc, submission);
+    } else if (isComputerCenterFacultyDeclaration) {
+      renderComputerCenterFacultyDeclarationPdf(doc, submission);
+    } else if (isComputerCenterEmailAccountRequest) {
+      renderComputerCenterEmailAccountRequestPdf(doc, submission);
+    } else if (isComputerCenterProxyLdapRequest) {
+      renderComputerCenterProxyLdapAccountRequestPdf(doc, submission);
     } else {
       // Header (logo placeholder + institute title)
       doc
