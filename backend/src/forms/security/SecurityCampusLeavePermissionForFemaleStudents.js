@@ -1,4 +1,5 @@
 const { getResponseValue, formatDate } = require("../../utils/pdfUtils");
+const pdfStyles = require("../../utils/pdfStyles");
 
 const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission) => {
   const responses = submission.responses;
@@ -21,14 +22,14 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // ── Header ──────────────────────────────────────────────────────────────────
   doc
     .font("Helvetica-Bold")
-    .fontSize(20)
+    .fontSize(pdfStyles.getFontSize('TITLE'))
     .text("IIT PATNA", { align: "center", underline: true });
 
   doc.moveDown(0.8);
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
     .text(
       "Campus Leaving Permission after 10:00 PM (For Female Students)",
       { align: "left" }
@@ -47,12 +48,12 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
 
     doc
       .font("Helvetica-Bold")
-      .fontSize(12)
+      .fontSize(pdfStyles.getFontSize('LABEL'))
       .text(labelText, leftMargin + indent, doc.y, { continued: true });
 
     doc
       .font("Helvetica")
-      .fontSize(12)
+      .fontSize(pdfStyles.getFontSize('BODY'))
       .text(` ${valueText}`, { continued: false });
 
     // underline for value area
@@ -72,11 +73,11 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // Field 4: Gender (pre-filled as Female)
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text("4. Gender: ", leftMargin, doc.y, { continued: true });
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(gender || "Female");
   doc.moveDown(0.6);
 
@@ -88,18 +89,18 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text("5. Date of leaving IIT Patna campus: ", leftMargin, doc.y, { continued: true });
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(`${dd} / ${mm} / ${yyyy}`);
   doc.moveDown(0.6);
 
   // Field 6: Reason for leaving
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text(
       "6. Reason for leaving campus after 10:00 pm: ",
       leftMargin,
@@ -108,7 +109,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
     );
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('SMALL'))
     .text(
       "(Specifically mention the mode of conveyance, boarding point & destination)",
       { continued: false }
@@ -117,7 +118,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   doc.moveDown(0.35);
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(reasonForLeaving, leftMargin, doc.y, { width: pageWidth });
 
   // underline lines for reason field
@@ -140,7 +141,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // ── Supporting documents note ────────────────────────────────────────────────
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text("(Please also enclose the supporting documents)");
 
   doc.moveDown(0.8);
@@ -148,7 +149,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // ── Field 7: Companions ───────────────────────────────────────────────────────
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(
       "7. Particulars of student(s) who would accompany the female",
       leftMargin,
@@ -157,7 +158,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
     );
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(
       " student (Maximum two persons can accompany a female student):",
       { continued: false }
@@ -178,11 +179,11 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
 
     const rowY = doc.y;
 
-    doc.font("Helvetica").fontSize(12).text(nameLabel, leftMargin, rowY, { continued: false });
-    doc.font("Helvetica").fontSize(12).text(cName || "", leftMargin + nameLabelWidth + 4, rowY - doc.currentLineHeight(true), { continued: false });
+    doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(nameLabel, leftMargin, rowY, { continued: false });
+    doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(cName || "", leftMargin + nameLabelWidth + 4, rowY - doc.currentLineHeight(true), { continued: false });
 
-    doc.font("Helvetica").fontSize(12).text(rollLabel, rollLabelX, rowY - doc.currentLineHeight(true) * 1, { continued: false });
-    doc.font("Helvetica").fontSize(12).text(cRoll || "", rollLineStart + 2, rowY - doc.currentLineHeight(true) * 2, { continued: false });
+    doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(rollLabel, rollLabelX, rowY - doc.currentLineHeight(true) * 1, { continued: false });
+    doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(cRoll || "", rollLineStart + 2, rowY - doc.currentLineHeight(true) * 2, { continued: false });
 
     // underlines
     const underlineY = rowY + 2;
@@ -201,7 +202,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // ── Approval note ─────────────────────────────────────────────────────────────
   doc
     .font("Helvetica")
-    .fontSize(11)
+    .fontSize(pdfStyles.getFontSize('SMALL'))
     .text(
       "(Please enclose the appropirate approval & specific purpose for leaving campus to be mentioned in the approval)",
       leftMargin,
@@ -214,7 +215,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // ── Undertaking text ──────────────────────────────────────────────────────────
   doc
     .font("Helvetica")
-    .fontSize(11)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(
       "I undertake that I have verified that the student(s) accompanying me, whose details are filled " +
       "in above, have prior approval of their respective wardens to leave the campus after 10:00 PM " +
@@ -233,7 +234,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
 
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text("Signature of the student with date", sigX, doc.y, {
       width: sigWidth,
       align: "center",
@@ -247,7 +248,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // Left side: Remarks of the Warden + Hostel Stamp
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text("Remarks of the Warden", leftMargin, wardenY, { underline: true });
 
   doc.moveDown(0.4);
@@ -265,7 +266,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
 
   doc
     .font("Helvetica")
-    .fontSize(9)
+    .fontSize(pdfStyles.getFontSize('SMALL'))
     .fillColor("#c47c2b")
     .text("Hostel", stampCenterX - 18, stampCenterY - 8)
     .text("Stamp", stampCenterX - 16, stampCenterY + 2)
@@ -274,7 +275,7 @@ const renderSecurityCampusLeavePermissionForFemaleStudentsPdf = (doc, submission
   // Right side: Signature of warden
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text("Signature of warden", sigX, wardenY + 60, {
       width: sigWidth,
       align: "center",

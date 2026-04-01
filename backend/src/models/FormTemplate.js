@@ -10,9 +10,9 @@ const fieldSchema = new mongoose.Schema({
     required: true,
   },
   type: {
-  type: String,
-  enum: ["text", "number", "date", "textarea", "select", "radio"],
-  default: "text",
+    type: String,
+    enum: ["text", "number", "date", "textarea", "select", "radio", "file", "email"],
+    default: "text",
   },
   required: {
     type: Boolean,

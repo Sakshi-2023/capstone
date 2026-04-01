@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
+import { standardInputSx, standardInputProps, formContainerSx, formPaperSx } from "../../utils/formStyles";
 
 const initialValues = {
   salutation: "Dr.",
@@ -21,26 +22,6 @@ const initialValues = {
   empNo: "",
   place: "",
   declarationDate: "",
-};
-
-const lineInputSx = {
-  minWidth: 160,
-  "& .MuiInputBase-input": {
-    pb: 0.35,
-    fontSize: 18,
-  },
-  "& .MuiInput-underline:before": {
-    borderBottomColor: "#222",
-  },
-  "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-    borderBottomColor: "#222",
-  },
-};
-
-const inlineField = {
-  variant: "standard",
-  size: "small",
-  InputLabelProps: { shrink: false },
 };
 
 const GenAdminForm = () => {
@@ -155,7 +136,7 @@ const GenAdminForm = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={formContainerSx}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h5" fontWeight={700}>
           Gen Admin Declaration Form
@@ -165,7 +146,7 @@ const GenAdminForm = () => {
         </Button>
       </Box>
 
-      <Paper sx={{ p: { xs: 2, md: 4 }, border: "1px solid #d8d8d8" }}>
+      <Paper sx={formPaperSx}>
         <Typography
           variant="h4"
           align="center"
@@ -181,8 +162,8 @@ const GenAdminForm = () => {
               select
               value={values.salutation}
               onChange={handleChange("salutation")}
-              sx={{ ...lineInputSx, minWidth: 110 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, minWidth: 110 }}
+              {...standardInputProps}
               SelectProps={{ displayEmpty: true }}
             >
               <MenuItem value="Dr.">Dr.</MenuItem>
@@ -193,8 +174,8 @@ const GenAdminForm = () => {
               value={values.fullName}
               onChange={handleChange("fullName")}
               placeholder="full name"
-              sx={{ ...lineInputSx, minWidth: 280, flex: 1 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, minWidth: 280, flex: 1 }}
+              {...standardInputProps}
             />
             <Typography sx={{ fontSize: 18, lineHeight: 1.4 }}>,</Typography>
           </Box>
@@ -205,16 +186,16 @@ const GenAdminForm = () => {
               value={values.designation}
               onChange={handleChange("designation")}
               placeholder="designation"
-              sx={{ ...lineInputSx, minWidth: 220 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, minWidth: 220 }}
+              {...standardInputProps}
             />
             <Typography sx={{ fontSize: 18, lineHeight: 1.4 }}>Dept./Section/Centre</Typography>
             <TextField
               value={values.department}
               onChange={handleChange("department")}
               placeholder="department"
-              sx={{ ...lineInputSx, minWidth: 220, flex: 1 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, minWidth: 220, flex: 1 }}
+              {...standardInputProps}
             />
             <Typography sx={{ fontSize: 18, lineHeight: 1.4 }}>,</Typography>
           </Box>
@@ -250,7 +231,7 @@ const GenAdminForm = () => {
                   onChange={handleChange("employeeSignatureName")}
                   placeholder="employee name"
                   fullWidth
-                  {...inlineField}
+                  {...standardInputProps}
                 />
               </Box>
               <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
@@ -261,7 +242,7 @@ const GenAdminForm = () => {
                   onChange={handleChange("empNo")}
                   placeholder="employee number"
                   fullWidth
-                  {...inlineField}
+                  {...standardInputProps}
                 />
               </Box>
               <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
@@ -272,7 +253,7 @@ const GenAdminForm = () => {
                   onChange={handleChange("place")}
                   placeholder="place"
                   fullWidth
-                  {...inlineField}
+                  {...standardInputProps}
                 />
               </Box>
               <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
@@ -283,7 +264,7 @@ const GenAdminForm = () => {
                   value={values.declarationDate}
                   onChange={handleChange("declarationDate")}
                   fullWidth
-                  {...inlineField}
+                  {...standardInputProps}
                 />
               </Box>
             </Box>

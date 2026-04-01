@@ -9,9 +9,19 @@ import BulkImport from "./pages/BulkImport";
 import Forms from "./pages/Forms";
 import FormFill from "./pages/FormFill";
 import GenAdminForm from "./forms/genadmin/GenAdminForm";  // self declaration form 
+import VehicleRequisitionForTransportForm from "./forms/genadmin/VehicleRequisitionForTransportForm";
 import SecurityCampusLeavePermissionForFemaleStudents from "./forms/security/SecurityCampusLeavePermissionForFemaleStudents";
+import SecurityRequisitionForVehicleSticker from "./forms/security/SecurityRequisitionForVehicleSticker";
+import SecurityVehicleStickerRequitionForMarriedScholar from "./forms/security/SecurityVehicleStickerRequitionForMarriedScholar";
+import SecurityUndertakingRegardingWorkerConductAndResponsibility from "./forms/security/SecurityUndertakingRegardingWorkerConductAndResponsibility";
 import ComputerCenterLdapAccountRequestForm from "./forms/cc/ComputerCenterLdapAccountRequestForm";
 import EstbDepartureRejoiningReportForm from "./forms/estb/EstbDepartureRejoiningReportForm";import Submissions from "./pages/Submissions";
+import ComputerCenterFacultyPerformaForm from "./forms/cc/ComputerCenterFacultyPerformaForm";
+import ComputerCenterFacultyDeclarationForm from "./forms/cc/ComputerCenterFacultyDeclarationForm";
+import ComputerCenterEmailAccountRequestForm from "./forms/cc/ComputerCenterEmailAccountRequestForm";
+import ComputerCenterProxyLdapAccountRequestForm from "./forms/cc/ComputerCenterProxyLdapAccountRequestForm";
+import FinanceProcurementRecommendationSanctionForm from "./forms/fin/RecommendationCumSanctionSheetForPurchaseDoubleBidInrForm";
+import Submissions from "./pages/Submissions";
 import Approvals from "./pages/Approvals";
 import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
@@ -76,6 +86,16 @@ function App() {
           }
         />
         <Route
+          path="/forms/gen-admin-vehicle-requisition-transport"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <VehicleRequisitionForTransportForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/forms/security-campus-leave-female"
           element={
             <PrivateRoute>
@@ -86,11 +106,51 @@ function App() {
           }
         />
         <Route
+          path="/forms/security_requisition_for_vehicle_sticker"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <SecurityRequisitionForVehicleSticker />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/security-vehicle-sticker-requition-for-married-scholar"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <SecurityVehicleStickerRequitionForMarriedScholar />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/security_undertaking_regarding_worker_conduct_and_responsibility"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <SecurityUndertakingRegardingWorkerConductAndResponsibility />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/forms/cc-ldap-account-request"
           element={
             <PrivateRoute>
               <Layout>
                 <ComputerCenterLdapAccountRequestForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/finance-procurement-recommendation-sanction-double-bid-inr"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <FinanceProcurementRecommendationSanctionForm />
               </Layout>
             </PrivateRoute>
           }
@@ -115,6 +175,46 @@ function App() {
     </PrivateRoute>
   }
 />
+        <Route
+          path="/forms/cc-faculty-performa"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterFacultyPerformaForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-faculty-declaration"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterFacultyDeclarationForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-email-account-request"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterEmailAccountRequestForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms/cc-proxy-ldap-request"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ComputerCenterProxyLdapAccountRequestForm />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/forms/:templateId/fill"
           element={

@@ -1,4 +1,5 @@
 const { getResponseValue, formatDate } = require("../../utils/pdfUtils");
+const pdfStyles = require("../../utils/pdfStyles");
 
 const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
   const responses = submission.responses;
@@ -20,7 +21,7 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
     const rowY = doc.y;
     const lineY = rowY + 14;
 
-    doc.font("Helvetica").fontSize(12).text(label, leftMargin, rowY);
+    doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text(label, leftMargin, rowY);
     doc
       .moveTo(lineStartX, lineY)
       .lineTo(lineEndX, lineY)
@@ -28,7 +29,7 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
       .stroke();
 
     if (value) {
-      doc.font("Helvetica").fontSize(12).text(value, lineStartX + 3, rowY, {
+      doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(value, lineStartX + 3, rowY, {
         width: lineEndX - lineStartX - 6,
         ellipsis: true,
       });
@@ -40,26 +41,26 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
   // ── Header ──────────────────────────────────────────────────────────────────
   doc
     .font("Helvetica-Bold")
-    .fontSize(14)
+    .fontSize(pdfStyles.getFontSize('TITLE'))
     .text("INDIAN INSTITUTE OF TECHNOLOGY PATNA", { align: "center" });
 
   doc.moveDown(0.15);
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(13)
-    .text("COMPUTER CENTREE", { align: "center" });
+    .fontSize(pdfStyles.getFontSize('TITLE'))
+    .text("COMPUTER CENTRE", { align: "center" });
 
   doc.moveDown(0.2);
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
     .text("REQUEST / REQUISITION FORM", { align: "center" });
 
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text("(For LDAP Account)", { align: "center" });
 
   doc.moveDown(0.9);
@@ -67,7 +68,7 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
   // ── Section A ───────────────────────────────────────────────────────────────
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
     .text("A. Personal Information (PLEASE FILL IN BLOCK LETTERS)");
 
   doc.moveDown(0.5);
@@ -89,13 +90,9 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
   // ── Section C ───────────────────────────────────────────────────────────────
   doc.moveDown(0.2);
   doc
-    .font("Helvetica")
-    .fontSize(12)
-    .text("C. Validity date / Last Date for", leftMargin, doc.y);
-  doc
-    .font("Helvetica")
-    .fontSize(12)
-    .text("LDAP account", leftMargin, doc.y);
+    .font("Helvetica-Bold")
+    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
+    .text("C. Validity date / Last Date for LDAP account");
 
   const cValueY = doc.y + 3;
   const cLineY = cValueY + 15;
@@ -106,7 +103,7 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
     .stroke();
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(validityLastDate || "", leftMargin + 3, cValueY);
 
   doc.y = cLineY + 18;
@@ -124,11 +121,11 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text("SIGNATURE", leftMargin, doc.y + 16);
 
   const dateTextY = doc.y + 6;
-  doc.font("Helvetica").fontSize(12).text("Date:", leftMargin, dateTextY);
+  doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text("Date:", leftMargin, dateTextY);
 
   const dateUnderlineY = dateTextY + 13;
   const dateStartX = leftMargin + doc.widthOfString("Date: ") + 2;
@@ -139,7 +136,7 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
     .stroke();
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(requestDate || "", dateStartX + 2, dateTextY, {
       width: leftMargin + sigLineWidth - dateStartX - 4,
       ellipsis: true,
@@ -155,7 +152,7 @@ const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
 
   doc
     .font("Helvetica-Bold")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('LABEL'))
     .text(
       "SIGNATURE OF FACULTY (IN-CHARGE)/ HOD",
       rightX,

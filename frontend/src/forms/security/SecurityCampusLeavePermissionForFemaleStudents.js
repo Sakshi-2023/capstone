@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
+import { standardInputSx, standardInputProps, formContainerSx, formPaperSx, labelSx } from "../../utils/formStyles";
 
 const TEMPLATE_SLUG = "/forms/security-campus-leave-permission-female/template";
 
@@ -28,41 +29,16 @@ const initialValues = {
 };
 
 // ── Shared sx / prop objects (module-level so they never change identity) ────
-const lineInputSx = {
-  minWidth: 160,
-  "& .MuiInputBase-input": {
-    // pb 0 so typed text sits flush at the baseline / underline boundary
-    pb: 0,
-    pt: "1px",
-    fontSize: 15,
-    lineHeight: 1.4,
-  },
-  "& .MuiInput-underline:before": {
-    borderBottomColor: "#222",
-  },
-  "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-    borderBottomColor: "#222",
-  },
-};
 
-const inlineField = {
-  variant: "standard",
-  size: "small",
-  InputLabelProps: { shrink: false },
-};
-
-// ── LabeledField must live OUTSIDE the page component.
-//    If defined inside, React creates a new component type on every render
-//    which unmounts/remounts the input, resetting focus after each keystroke.
 const LabeledField = ({ label, fieldName, placeholder, flex, minWidth = 200, values, onChange }) => (
   <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: 1, mt: 1.5 }}>
-    <Typography sx={{ fontSize: 15, fontWeight: 700 }}>{label}</Typography>
+    <Typography sx={labelSx}>{label}</Typography>
     <TextField
       value={values[fieldName]}
       onChange={onChange(fieldName)}
       placeholder={placeholder || ""}
-      sx={{ ...lineInputSx, minWidth, flex: flex || 1 }}
-      {...inlineField}
+      sx={{ ...standardInputSx, minWidth, flex: flex || 1 }}
+      {...standardInputProps}
     />
   </Box>
 );
@@ -179,7 +155,7 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={formContainerSx}>
       {/* Top nav */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h5" fontWeight={700}>
@@ -190,7 +166,7 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
         </Button>
       </Box>
 
-      <Paper sx={{ p: { xs: 2, md: 4 }, border: "1px solid #d8d8d8" }}>
+      <Paper sx={formPaperSx}>
         {/* ── Header ── */}
         <Typography
           variant="h4"
@@ -246,8 +222,8 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
             type="date"
             value={values.dateOfLeaving}
             onChange={handleChange("dateOfLeaving")}
-            sx={{ ...lineInputSx, minWidth: 180 }}
-            {...inlineField}
+            sx={{ ...standardInputSx, minWidth: 180 }}
+            {...standardInputProps}
           />
         </Box>
 
@@ -303,8 +279,8 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
             <TextField
               value={values.companion1Name}
               onChange={handleChange("companion1Name")}
-              sx={{ ...lineInputSx, flex: 1 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, flex: 1 }}
+              {...standardInputProps}
             />
           </Box>
           <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, minWidth: 180 }}>
@@ -312,8 +288,8 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
             <TextField
               value={values.companion1RollNo}
               onChange={handleChange("companion1RollNo")}
-              sx={{ ...lineInputSx, minWidth: 120 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, minWidth: 120 }}
+              {...standardInputProps}
             />
           </Box>
         </Box>
@@ -325,8 +301,8 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
             <TextField
               value={values.companion2Name}
               onChange={handleChange("companion2Name")}
-              sx={{ ...lineInputSx, flex: 1 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, flex: 1 }}
+              {...standardInputProps}
             />
           </Box>
           <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, minWidth: 180 }}>
@@ -334,8 +310,8 @@ const SecurityCampusLeavePermissionForFemaleStudents = () => {
             <TextField
               value={values.companion2RollNo}
               onChange={handleChange("companion2RollNo")}
-              sx={{ ...lineInputSx, minWidth: 120 }}
-              {...inlineField}
+              sx={{ ...standardInputSx, minWidth: 120 }}
+              {...standardInputProps}
             />
           </Box>
         </Box>

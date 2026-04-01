@@ -1,4 +1,5 @@
 const { getResponseValue, formatDate } = require("../../utils/pdfUtils");
+const pdfStyles = require("../../utils/pdfStyles");
 
 const renderGenAdminPdf = (doc, submission) => {
   const responses = submission.responses;
@@ -11,16 +12,11 @@ const renderGenAdminPdf = (doc, submission) => {
   const place = String(getResponseValue(responses, "place") || "").trim();
   const declarationDate = formatDate(getResponseValue(responses, "declarationDate"));
 
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(24)
-    .text("DECLARATION", { align: "center", underline: true });
-
-  doc.moveDown(2);
+  pdfStyles.applyDeclarationHeader(doc, "DECLARATION");
 
   doc
     .font("Helvetica")
-    .fontSize(12)
+    .fontSize(pdfStyles.getFontSize('BODY'))
     .text(`I, ${salutation} ${fullName},`);
   doc.text(`Designation ${designation}   Dept./Section/Centre ${department},`);
   doc.text("IIT Patna declare that there is nothing adverse against me in the Police record either");
@@ -37,31 +33,22 @@ const renderGenAdminPdf = (doc, submission) => {
 
   const drawWidth = 220;
   const rightX = doc.page.width - doc.page.margins.right - drawWidth;
-  doc.moveTo(rightX, doc.y).lineTo(rightX + drawWidth, doc.y).stroke();
-  doc.moveDown(0.2);
-
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(11)
-    .text("SIGNATURE OF THE EMPLOYEE", rightX, doc.y, {
-      width: drawWidth,
-      align: "center",
-    });
-
-  doc.moveDown(1.2);
-  doc.x = rightX;
-  doc.font("Helvetica").fontSize(12).text(`Name    : ${employeeSignatureName}`);
-  doc.x = rightX;
-  doc.font("Helvetica").fontSize(12).text(`Emp_No. : ${empNo}`);
-  doc.x = rightX;
-  doc.font("Helvetica").fontSize(12).text(`Place   : ${place}`);
-  doc.x = rightX;
-  doc.font("Helvetica").fontSize(12).text(`Date    : ${declarationDate}`);
+  
+  pdfStyles.applySignatureBlock(
+    doc,
+    "SIGNATURE OF THE EMPLOYEE",
+    employeeSignatureName,
+    empNo,
+    place,
+    declarationDate,
+    rightX,
+    drawWidth
+  );
 
   doc.moveDown(1.2);
-  doc.font("Helvetica-Bold").fontSize(12).text("To", doc.page.margins.left, doc.y);
-  doc.font("Helvetica-Bold").fontSize(12).text("The Director", doc.page.margins.left + 32, doc.y + 2);
-  doc.font("Helvetica-Bold").fontSize(12).text("IIT Patna", doc.page.margins.left + 32, doc.y + 2);
+  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("To", doc.page.margins.left, doc.y);
+  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("The Director", doc.page.margins.left + 32, doc.y + 2);
+  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("IIT Patna", doc.page.margins.left + 32, doc.y + 2);
 };
 
 module.exports = { renderGenAdminPdf };

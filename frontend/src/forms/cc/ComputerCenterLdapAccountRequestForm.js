@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
+import { tableFieldSx, borderedCellSx, formContainerSx, formPaperSx } from "../../utils/formStyles";
 
 const TEMPLATE_SLUG = "/forms/computer-center-ldap-account-request/template";
 
@@ -23,30 +24,6 @@ const initialValues = {
   iitpEmailId: "",
   validityLastDate: "",
   requestDate: "",
-};
-
-const tableTextFieldSx = {
-  width: "100%",
-  "& .MuiInputBase-root": {
-    fontSize: 13,
-    py: 0.25,
-  },
-  "& .MuiInputBase-input": {
-    py: 0.4,
-  },
-  "& fieldset": {
-    border: "none",
-  },
-};
-
-const borderedCellSx = {
-  borderRight: "1px solid #222",
-  borderBottom: "1px solid #222",
-  p: 0.6,
-  display: "flex",
-  alignItems: "center",
-  minHeight: 34,
-  fontSize: 13,
 };
 
 const ComputerCenterLdapAccountRequestForm = () => {
@@ -166,7 +143,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={formContainerSx}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h5" fontWeight={700}>
           Computer Center LDAP Account Request
@@ -176,7 +153,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
         </Button>
       </Box>
 
-      <Paper sx={{ p: { xs: 2, md: 4 }, border: "1px solid #d8d8d8" }}>
+      <Paper sx={formPaperSx}>
         <Typography variant="h5" align="center" fontWeight={800} sx={{ letterSpacing: 0.3 }}>
           INDIAN INSTITUTE OF TECHNOLOGY PATNA
         </Typography>
@@ -228,32 +205,32 @@ const ComputerCenterLdapAccountRequestForm = () => {
                 placeholder=""
                 value={values.empIdProjectId}
                 onChange={handleChange("empIdProjectId")}
-                sx={tableTextFieldSx}
+                sx={tableFieldSx}
               />
             </Box>
 
             <Box sx={borderedCellSx}>2.</Box>
             <Box sx={borderedCellSx}>Full Name</Box>
             <Box sx={{ ...borderedCellSx, borderRight: "none", p: 0.2 }}>
-              <TextField variant="outlined" value={values.fullName} onChange={handleChange("fullName")} sx={tableTextFieldSx} />
+              <TextField variant="outlined" value={values.fullName} onChange={handleChange("fullName")} sx={tableFieldSx} />
             </Box>
 
             <Box sx={borderedCellSx}>3.</Box>
             <Box sx={borderedCellSx}>Dept./Section/Centre</Box>
             <Box sx={{ ...borderedCellSx, borderRight: "none", p: 0.2 }}>
-              <TextField variant="outlined" value={values.department} onChange={handleChange("department")} sx={tableTextFieldSx} />
+              <TextField variant="outlined" value={values.department} onChange={handleChange("department")} sx={tableFieldSx} />
             </Box>
 
             <Box sx={borderedCellSx}>4.</Box>
             <Box sx={borderedCellSx}>Phone/Mobile No.:</Box>
             <Box sx={{ ...borderedCellSx, borderRight: "none", p: 0.2 }}>
-              <TextField variant="outlined" value={values.phoneMobileNo} onChange={handleChange("phoneMobileNo")} sx={tableTextFieldSx} />
+              <TextField variant="outlined" value={values.phoneMobileNo} onChange={handleChange("phoneMobileNo")} sx={tableFieldSx} />
             </Box>
 
             <Box sx={borderedCellSx}>5.</Box>
             <Box sx={borderedCellSx}>Personal Email-ID</Box>
             <Box sx={{ ...borderedCellSx, borderRight: "none", p: 0.2 }}>
-              <TextField variant="outlined" value={values.personalEmailId} onChange={handleChange("personalEmailId")} sx={tableTextFieldSx} />
+              <TextField variant="outlined" value={values.personalEmailId} onChange={handleChange("personalEmailId")} sx={tableFieldSx} />
             </Box>
 
             <Box sx={{ ...borderedCellSx, alignItems: "flex-start", pt: 0.8, minHeight: 95 }}>6.</Box>
@@ -265,7 +242,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
                 rows={3}
                 value={values.address}
                 onChange={handleChange("address")}
-                sx={tableTextFieldSx}
+                sx={tableFieldSx}
               />
             </Box>
           </Box>
@@ -274,7 +251,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
             <Box sx={borderedCellSx}>B.</Box>
             <Box sx={borderedCellSx}>IITP Email id (If any):</Box>
             <Box sx={{ ...borderedCellSx, borderRight: "none", p: 0.2 }}>
-              <TextField variant="outlined" value={values.iitpEmailId} onChange={handleChange("iitpEmailId")} sx={tableTextFieldSx} />
+              <TextField variant="outlined" value={values.iitpEmailId} onChange={handleChange("iitpEmailId")} sx={tableFieldSx} />
             </Box>
           </Box>
 
@@ -289,7 +266,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
                 variant="outlined"
                 value={values.validityLastDate}
                 onChange={handleChange("validityLastDate")}
-                sx={tableTextFieldSx}
+                sx={tableFieldSx}
                 InputLabelProps={{ shrink: true }}
               />
             </Box>
@@ -312,7 +289,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
                 variant="standard"
                 value={values.requestDate}
                 onChange={handleChange("requestDate")}
-                sx={{ width: 140, "& .MuiInputBase-input": { py: 0.2, fontSize: 13 } }}
+                sx={{ width: 140, "& .MuiInputBase-input": { py: 0.2, fontSize: 16 } }}
                 InputLabelProps={{ shrink: true }}
               />
             </Box>
