@@ -1,16 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
   Container,
   Paper,
-  TextField,
   Typography,
   CircularProgress,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
-import { tableFieldSx, borderedCellSx, formContainerSx, formPaperSx } from "../../utils/formStyles";
+import { formContainerSx, formPaperSx } from "../../utils/formStyles";
 
 const TEMPLATE_SLUG = "/forms/computer-center-proxy-ldap-request/template";
 
@@ -31,8 +30,65 @@ const initialValues = {
   date: "",
   place: "",
   studentSignature: "",
-  guideSignature: "",
 };
+
+const FONT = "serif";
+const BORDER = "1px solid #aaa";
+
+const inputStyle = {
+  width: "100%",
+  border: "none",
+  outline: "none",
+  background: "transparent",
+  fontFamily: FONT,
+  fontSize: "0.88rem",
+  padding: 0,
+  boxSizing: "border-box",
+};
+
+const cellSx = { border: BORDER, padding: "5px 8px", verticalAlign: "middle" };
+const tallCellSx = { ...cellSx, verticalAlign: "top", height: 72 };
+
+const SectionHeading = ({ children }) => (
+  <Typography sx={{ fontFamily: FONT, fontWeight: 700, fontSize: "0.95rem", mt: 2.5, mb: 0.8, color: "#000" }}>
+    {children}
+  </Typography>
+);
+
+/* 4-column table for User Information */
+const Tbl = ({ children }) => (
+  <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", border: BORDER, fontFamily: FONT, fontSize: "0.88rem", color: "#000" }}>
+    <Box component="colgroup">
+      <Box component="col" sx={{ width: "22%" }} />
+      <Box component="col" sx={{ width: "28%" }} />
+      <Box component="col" sx={{ width: "22%" }} />
+      <Box component="col" sx={{ width: "28%" }} />
+    </Box>
+    <Box component="tbody">{children}</Box>
+  </Box>
+);
+
+/* [label | input | label | input] */
+const Row2 = ({ l1, n1, l2, n2, type2, values, onChange }) => (
+  <Box component="tr">
+    <Box component="td" sx={cellSx}>{l1}</Box>
+    <Box component="td" sx={cellSx}><input name={n1} value={values[n1]} onChange={onChange} style={inputStyle} /></Box>
+    <Box component="td" sx={cellSx}>{l2}</Box>
+    <Box component="td" sx={cellSx}><input name={n2} value={values[n2]} onChange={onChange} type={type2 || "text"} style={inputStyle} /></Box>
+  </Box>
+);
+
+/* [label | input spanning cols 2-4] */
+const RowFull = ({ label, name, tall, values, onChange }) => (
+  <Box component="tr">
+    <Box component="td" sx={tall ? tallCellSx : cellSx}>{label}</Box>
+    <Box component="td" colSpan={3} sx={tall ? tallCellSx : cellSx}>
+      {tall
+        ? <textarea name={name} value={values[name]} onChange={onChange} style={{ ...inputStyle, minHeight: 60, resize: "vertical" }} />
+        : <input name={name} value={values[name]} onChange={onChange} style={inputStyle} />}
+    </Box>
+  </Box>
+);
 
 const ComputerCenterProxyLdapAccountRequestForm = () => {
   const location = useLocation();
@@ -48,9 +104,7 @@ const ComputerCenterProxyLdapAccountRequestForm = () => {
 
   React.useEffect(() => {
     const prefill = location.state?.prefill;
-    if (prefill && typeof prefill === "object") {
-      setValues((prev) => ({ ...prev, ...prefill }));
-    }
+    if (prefill && typeof prefill === "object") setValues((prev) => ({ ...prev, ...prefill }));
   }, [location.state]);
 
   React.useEffect(() => {
@@ -72,16 +126,9 @@ const ComputerCenterProxyLdapAccountRequestForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setSaving(true);
-
+    setError(""); setSuccess(""); setSaving(true);
     try {
-      const res = await API.post("/submissions", {
-        templateId,
-        responses: values,
-      });
-
+      const res = await API.post("/submissions", { templateId, responses: values });
       setSubmissionId(res.data._id);
       setSuccess("Form submitted successfully!");
     } catch (err) {
@@ -95,9 +142,7 @@ const ComputerCenterProxyLdapAccountRequestForm = () => {
     if (!submissionId) return;
     setPdfLoading(true);
     try {
-      const res = await API.get(`/submissions/${submissionId}/pdf`, {
-        responseType: "blob",
-      });
+      const res = await API.get(`/submissions/${submissionId}/pdf`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -113,305 +158,122 @@ const ComputerCenterProxyLdapAccountRequestForm = () => {
     }
   };
 
+  const p = { values, onChange: handleChange };
+
   return (
     <Container maxWidth="md" sx={formContainerSx}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Typography variant="h5" fontWeight={700}>
-          Computer Center Proxy LDAP Request Form
-        </Typography>
-        <Button variant="text" onClick={() => navigate("/forms")}>
-          Back to Forms
-        </Button>
+        <Typography variant="h5" fontWeight={700}>Computer Center Proxy LDAP Request Form</Typography>
+        <Button variant="text" onClick={() => navigate("/forms")}>Back to Forms</Button>
       </Box>
 
-      <Paper sx={formPaperSx}>
-        <Typography variant="h6" align="center" fontWeight={700} sx={{ mb: 1 }}>
+      <Paper sx={{ ...formPaperSx, fontFamily: FONT, p: 4, color: "#000" }}>
+
+        {/* Header */}
+        <Typography align="center" sx={{ fontFamily: FONT, fontWeight: 700, fontSize: "1.35rem" }}>
           Requisition Form for Trainee
         </Typography>
-        <Typography variant="body1" align="center" sx={{ mb: 3 }}>
+        <Typography align="center" sx={{ fontFamily: FONT, fontSize: "0.9rem", mb: 1 }}>
           Computer Center, IIT Patna
         </Typography>
+        <Box sx={{ borderTop: "1.5px dashed #aaa", mb: 2 }} />
 
         <Box component="form" onSubmit={handleSubmit}>
-          <Box sx={{ border: "1px solid #222", p: 3 }}>
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ mb: 2 }}>
-                User Information:
-              </Typography>
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 3 }}>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Student Name:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="studentName"
-                    value={values.studentName}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Student Roll No.</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="studentRollNo"
-                    value={values.studentRollNo}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box sx={{ gridColumn: "span 2" }}>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Institute/Organization/College Name:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="instituteName"
-                    value={values.instituteName}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Email:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Mobile No:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="mobileNo"
-                    value={values.mobileNo}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Department:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="department"
-                    value={values.department}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Ph. No:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="phNo"
-                    value={values.phNo}
-                    onChange={handleChange}
-                  />
-                </Box>
-              </Box>
-              
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Address:</Typography>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  name="address"
-                  value={values.address}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
+
+          {/* ── User Information ── */}
+          <SectionHeading>User Information:</SectionHeading>
+          <Tbl>
+            <Row2 l1="Student Name:" n1="studentName" l2="Student Roll No." n2="studentRollNo" {...p} />
+            <RowFull label="Institute/Organization/College Name:" name="instituteName" {...p} />
+            <Row2 l1="Email:" n1="email" l2="Mobile No:" n2="mobileNo" {...p} />
+            <Row2 l1="Department:" n1="department" l2="Ph. No:" n2="phNo" {...p} />
+            <RowFull label="Address:" name="address" tall {...p} />
+          </Tbl>
+
+          {/* ── Requirements of Proxy Account ── */}
+          <SectionHeading>Requirements of Proxy Account:</SectionHeading>
+          <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", border: BORDER, fontFamily: FONT, fontSize: "0.88rem", color: "#000" }}>
+            <Box component="colgroup">
+              <Box component="col" sx={{ width: "20%" }} />
+              <Box component="col" sx={{ width: "40%" }} />
+              <Box component="col" sx={{ width: "20%" }} />
+              <Box component="col" sx={{ width: "20%" }} />
             </Box>
-            
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ mb: 2 }}>
-                Requirements of Proxy Account:
-              </Typography>
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Proxy Account:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="proxyAccount"
-                    value={values.proxyAccount}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Last day date:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="lastDayDate"
-                    type="date"
-                    value={values.lastDayDate}
-                    onChange={handleChange}
-                    required
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Box>
+            <Box component="tbody">
+              <Box component="tr">
+                <Box component="td" sx={cellSx}>Proxy Account</Box>
+                <Box component="td" sx={cellSx}><input name="proxyAccount" value={values.proxyAccount} onChange={handleChange} style={inputStyle} /></Box>
+                <Box component="td" sx={cellSx}>Last day date</Box>
+                <Box component="td" sx={cellSx}><input name="lastDayDate" type="date" value={values.lastDayDate} onChange={handleChange} style={inputStyle} /></Box>
               </Box>
-            </Box>
-            
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ mb: 2 }}>
-                Guide Information:
-              </Typography>
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 3 }}>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Guide Name:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="guideName"
-                    value={values.guideName}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Designation:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="guideDesignation"
-                    value={values.guideDesignation}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-                <Box sx={{ gridColumn: "span 2" }}>
-                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Department:</Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    name="guideDepartment"
-                    value={values.guideDepartment}
-                    onChange={handleChange}
-                    required
-                  />
-                </Box>
-              </Box>
-            </Box>
-            
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 4 }}>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Date:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="date"
-                  type="date"
-                  value={values.date}
-                  onChange={handleChange}
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Box>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Place:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="place"
-                  value={values.place}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-            </Box>
-            
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mb: 4 }}>
-              <Box sx={{ flex: 1, mr: 2 }}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Student Signature:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="studentSignature"
-                  value={values.studentSignature}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-              <Box sx={{ flex: 1, ml: 2 }}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Guide Signature:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="guideSignature"
-                  value={values.guideSignature}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-            </Box>
-            
-            <Box sx={{ textAlign: "center", mt: 4 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
-                Approved
-              </Typography>
-              <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                (Guide Signature)
-              </Typography>
             </Box>
           </Box>
 
-          {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
-              {error}
-            </Typography>
-          )}
+          {/* ── Guide Information ── */}
+          <SectionHeading>Guide Information:</SectionHeading>
+          <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", border: BORDER, fontFamily: FONT, fontSize: "0.88rem", color: "#000" }}>
+            <Box component="colgroup">
+              <Box component="col" sx={{ width: "25%" }} />
+              <Box component="col" sx={{ width: "25%" }} />
+              <Box component="col" sx={{ width: "25%" }} />
+              <Box component="col" sx={{ width: "25%" }} />
+            </Box>
+            <Box component="tbody">
+              <Box component="tr">
+                <Box component="td" sx={cellSx}>Guide Name</Box>
+                <Box component="td" sx={cellSx}><input name="guideName" value={values.guideName} onChange={handleChange} style={inputStyle} /></Box>
+                <Box component="td" sx={cellSx}>Designation</Box>
+                <Box component="td" sx={cellSx}><input name="guideDesignation" value={values.guideDesignation} onChange={handleChange} style={inputStyle} /></Box>
+              </Box>
+              <Box component="tr">
+                <Box component="td" sx={tallCellSx}>Department</Box>
+                <Box component="td" colSpan={3} sx={tallCellSx}>
+                  <textarea name="guideDepartment" value={values.guideDepartment} onChange={handleChange} style={{ ...inputStyle, minHeight: 60, resize: "vertical" }} />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
-          {success && (
-            <Typography color="success.main" sx={{ mt: 2 }}>
-              {success}
-            </Typography>
-          )}
+          {/* ── Date / Place / Student Signature ── */}
+          <Box sx={{ mt: 3, fontFamily: FONT, fontSize: "0.9rem", color: "#000" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+              <Typography sx={{ fontFamily: FONT, fontSize: "0.9rem", whiteSpace: "nowrap" }}>Date:</Typography>
+              <input name="date" type="date" value={values.date} onChange={handleChange}
+                style={{ ...inputStyle, width: 160, borderBottom: "1px solid #888" }} />
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography sx={{ fontFamily: FONT, fontSize: "0.9rem", whiteSpace: "nowrap" }}>Place:</Typography>
+                <input name="place" value={values.place} onChange={handleChange}
+                  style={{ ...inputStyle, width: 180, borderBottom: "1px solid #888" }} />
+              </Box>
+              <Box sx={{ textAlign: "right" }}>
+                <Typography sx={{ fontFamily: FONT, fontSize: "0.9rem", mb: 0.5 }}>Student Signature</Typography>
+                <Box sx={{ borderBottom: "1px solid #888", width: 180 }} />
+              </Box>
+            </Box>
+          </Box>
+
+          {/* ── Approved / Guide Signature ── */}
+          <Box sx={{ mt: 5, textAlign: "right", fontFamily: FONT, color: "#000" }}>
+            <Typography sx={{ fontFamily: FONT, fontSize: "0.9rem" }}>Approved</Typography>
+            <Box sx={{ mt: 3 }}>
+              <Typography sx={{ fontFamily: FONT, fontSize: "0.9rem" }}>(Guide Signature)</Typography>
+            </Box>
+          </Box>
+
+          {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+          {success && <Typography color="success.main" sx={{ mt: 2 }}>{success}</Typography>}
 
           <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={saving}
-              startIcon={saving && <CircularProgress size={20} />}
-            >
+            <Button type="submit" variant="contained" disabled={saving}
+              startIcon={saving && <CircularProgress size={20} />}>
               {saving ? "Submitting..." : "Submit Form"}
             </Button>
-
             {submissionId && (
-              <Button
-                variant="outlined"
-                onClick={handleDownloadPdf}
-                disabled={pdfLoading}
-                startIcon={pdfLoading && <CircularProgress size={20} />}
-              >
+              <Button variant="outlined" onClick={handleDownloadPdf} disabled={pdfLoading}
+                startIcon={pdfLoading && <CircularProgress size={20} />}>
                 {pdfLoading ? "Generating..." : "Download PDF"}
               </Button>
             )}

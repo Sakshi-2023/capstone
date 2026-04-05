@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
-import { tableFieldSx, borderedCellSx, formContainerSx, formPaperSx } from "../../utils/formStyles";
+import { formContainerSx, formPaperSx } from "../../utils/formStyles";
 
 const TEMPLATE_SLUG = "/forms/computer-center-faculty-declaration/template";
 
@@ -22,6 +22,72 @@ const initialValues = {
   facultySignature: "",
   date: "",
 };
+
+/* Inline styles to match the document look */
+const docStyles = {
+  paper: {
+    fontFamily: "serif",
+    p: 5,
+    maxWidth: 700,
+    mx: "auto",
+    backgroundColor: "#fff",
+    color: "#000",
+    lineHeight: 1.8,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+  },
+  title: {
+    fontFamily: "serif",
+    fontWeight: 700,
+    fontSize: "1.3rem",
+    textAlign: "center",
+    mb: 3,
+    color: "#000",
+  },
+  bodyText: {
+    fontFamily: "serif",
+    fontSize: "0.97rem",
+    mb: 1,
+    color: "#000",
+  },
+  penaltyText: {
+    fontFamily: "serif",
+    fontWeight: 700,
+    fontSize: "0.97rem",
+    mt: 2,
+    mb: 3,
+    color: "#000",
+  },
+  label: {
+    fontFamily: "serif",
+    fontSize: "0.97rem",
+    color: "#000",
+    whiteSpace: "nowrap",
+  },
+  input: {
+    fontFamily: "serif",
+    fontSize: "0.97rem",
+    "& .MuiInput-underline:before": { borderBottom: "1px solid #000" },
+    "& .MuiInput-underline:after": { borderBottom: "1px solid #000" },
+    "& input": { fontFamily: "serif", fontSize: "0.97rem", pb: "2px" },
+  },
+};
+
+const FieldRow = ({ label, name, value, onChange, type }) => (
+  <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1, mb: 0.5 }}>
+    <Typography sx={docStyles.label}>{label}:</Typography>
+    <TextField
+      variant="standard"
+      size="small"
+      name={name}
+      value={value}
+      onChange={onChange}
+      type={type || "text"}
+      required
+      InputLabelProps={type === "date" ? { shrink: true } : undefined}
+      sx={{ ...docStyles.input, flexGrow: 1 }}
+    />
+  </Box>
+);
 
 const ComputerCenterFacultyDeclarationForm = () => {
   const location = useLocation();
@@ -64,13 +130,11 @@ const ComputerCenterFacultyDeclarationForm = () => {
     setError("");
     setSuccess("");
     setSaving(true);
-
     try {
       const res = await API.post("/submissions", {
         templateId,
         responses: values,
       });
-
       setSubmissionId(res.data._id);
       setSuccess("Form submitted successfully!");
     } catch (err) {
@@ -113,108 +177,120 @@ const ComputerCenterFacultyDeclarationForm = () => {
         </Button>
       </Box>
 
-      <Paper sx={formPaperSx}>
-        <Typography variant="h6" align="center" fontWeight={700} sx={{ mb: 3 }}>
+      <Paper sx={{ ...formPaperSx, ...docStyles.paper }}>
+        {/* Title */}
+        <Typography sx={docStyles.title}>
           IIT Patna Website Faculty Declaration Form
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
-          <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8 }}>
+          {/* Intro */}
+          <Typography sx={docStyles.bodyText}>
             On being given full access to my personal web page, I hereby declare that:
-            <br /><br />
-            1. I will take full responsibility of maintaining it. I will not disclose the web page username and password to anyone.
-            <br /><br />
-            2. I will not post any negative or untoward remarks against any fellow faculty member/staff or against the administration of the Institute on the web page.
-            <br /><br />
-            3. I will not post any political content on the web page.
-            <br /><br />
-            In case of violation of any of the above, I understand that I will be subjected to penal action by the Institute.
           </Typography>
 
-          <Box sx={{ border: "1px solid #222", p: 3, mb: 3 }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 3 }}>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Faculty Name:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="facultyName"
-                  value={values.facultyName}
-                  onChange={handleChange}
-                  required
-                />
+          {/* Numbered list */}
+          <Box component="ol" sx={{ pl: 3, mb: 0 }}>
+            {[
+              "I will take full responsibility of maintaining it. I will not disclose the web page username and password to anyone.",
+              "I will not post any negative or untoward remarks against any fellow faculty member/staff or against the administration of the Institute on the web page.",
+              "I will not post any political content on the web page.",
+            ].map((item, i) => (
+              <Box
+                component="li"
+                key={i}
+                sx={{ ...docStyles.bodyText, mb: 1 }}
+              >
+                {item}
               </Box>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Employee No:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="employeeNo"
-                  value={values.employeeNo}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Designation:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="designation"
-                  value={values.designation}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Department:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="department"
-                  value={values.department}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-            </Box>
-            
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Faculty Signature:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="facultySignature"
-                  value={values.facultySignature}
-                  onChange={handleChange}
-                  required
-                />
-              </Box>
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Date:</Typography>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  name="date"
-                  type="date"
-                  value={values.date}
-                  onChange={handleChange}
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Box>
-            </Box>
+            ))}
           </Box>
 
-          <Typography variant="body2" sx={{ fontStyle: "italic", mt: 2, mb: 3 }}>
-            Note: Please submit two copies of this form. One will be with the website team and the other in your personal file.
+          {/* Penalty clause — bold */}
+          <Typography sx={docStyles.penaltyText}>
+            In case of violation of any of the above, I understand that I will
+            be subjected to penal action by the Institute.
+          </Typography>
+
+          {/* Two-column fields: Faculty Name | Employee No */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              columnGap: 4,
+              rowGap: 2,
+              mb: 2,
+            }}
+          >
+            <FieldRow
+              label="Faculty Name"
+              name="facultyName"
+              value={values.facultyName}
+              onChange={handleChange}
+            />
+            <FieldRow
+              label="Employee No"
+              name="employeeNo"
+              value={values.employeeNo}
+              onChange={handleChange}
+            />
+            <FieldRow
+              label="Designation"
+              name="designation"
+              value={values.designation}
+              onChange={handleChange}
+            />
+            <FieldRow
+              label="Department"
+              name="department"
+              value={values.department}
+              onChange={handleChange}
+            />
+          </Box>
+
+          {/* Faculty Signature — full width */}
+          <Box sx={{ mb: 1.5 }}>
+            <Typography sx={{ ...docStyles.label, fontWeight: 700 }}>
+              Faculty Signature:
+            </Typography>
+            <TextField
+              variant="standard"
+              size="small"
+              name="facultySignature"
+              value={values.facultySignature}
+              onChange={handleChange}
+              required
+              fullWidth
+              sx={docStyles.input}
+            />
+          </Box>
+
+          {/* Date — full width */}
+          <Box sx={{ mb: 3 }}>
+            <Typography sx={{ ...docStyles.label, fontWeight: 700 }}>
+              Date:
+            </Typography>
+            <TextField
+              variant="standard"
+              size="small"
+              name="date"
+              type="date"
+              value={values.date}
+              onChange={handleChange}
+              required
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              sx={docStyles.input}
+            />
+          </Box>
+
+          {/* Note */}
+          <Typography sx={docStyles.bodyText}>
+            <Box component="span" sx={{ fontWeight: 700 }}>
+              Note
+            </Box>
+            : Please submit two copies of this form. One will be with the
+            website team and the other in your personal file.
           </Typography>
 
           {error && (
@@ -222,7 +298,6 @@ const ComputerCenterFacultyDeclarationForm = () => {
               {error}
             </Typography>
           )}
-
           {success && (
             <Typography color="success.main" sx={{ mt: 2 }}>
               {success}

@@ -68,7 +68,6 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log("LOGIN ATTEMPT:", req.body); // Check what the frontend sent
   try {
     const { email, password } = req.body;
     const normalizedEmail = String(email || "").trim().toLowerCase();

@@ -46,8 +46,11 @@ const submitForm = async (req, res) => {
         .json({ message: "Template and responses required" });
     }
 
-    // Ensure template exists
-    const template = await FormTemplate.findById(templateId);
+    // Ensure template exists — templateId may be a MongoDB ObjectId OR a template code string
+    const isObjectId = /^[a-f\d]{24}$/i.test(String(templateId));
+    const template = isObjectId
+      ? await FormTemplate.findById(templateId)
+      : await FormTemplate.findOne({ code: templateId });
     if (!template) {
       return res.status(404).json({ message: "Template not found" });
     }
@@ -71,16 +74,27 @@ const submitForm = async (req, res) => {
       parentSubmission = parent._id;
     }
 
-    const submission = await FormSubmission.create({
-      template: templateId,
+    // Prepare submission data
+    const submissionData = {
+      template: template._id,  // always store the real ObjectId
       submittedBy: req.user.id,
-      responses,
+      responses: new Map(Object.entries(responses)),
       status: "submitted",
       version,
       parentSubmission,
       approvalStages: template.approvalStages || [],
       currentStageIndex: 0,
-    });
+    };
+
+    // Handle photo upload if present
+    if (req.file) {
+      submissionData.photo = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
+    }
+
+    const submission = await FormSubmission.create(submissionData);
 
     res.status(201).json(submission);
   } catch (error) {
@@ -260,8 +274,6 @@ const generateSubmissionPDF = async (req, res) => {
       templateCode === SECURITY_UNDERTAKING_REGARDING_WORKER_CONDUCT_AND_RESPONSIBILITY_CODE;
     const isComputerCenterLdapRequest = templateCode === CC_LDAP_ACCOUNT_REQUEST_CODE;
     const isEstbDepartureRejoining = templateCode === ESTB_DEPARTURE_REJOINING_CODE;
-
-    const doc = new PDFDocument({ margin: isGenAdmin ? 70 : 50, size: "A4" });
     const isFinanceProcurementRecommendationSanction =
       templateCode === FINANCE_PROCUREMENT_RECOMMENDATION_SANCTION_CODE;
     const isComputerCenterFacultyPerforma = templateCode === CC_FACULTY_PERFORMA_CODE;
@@ -304,8 +316,7 @@ const generateSubmissionPDF = async (req, res) => {
     } else if (isComputerCenterLdapRequest) {
       renderComputerCenterRequestingLdapAccountPdf(doc, submission);
     } else if (isEstbDepartureRejoining) {
-  renderEstbDepartureRejoiningReportPdf(doc, submission);
-}else {
+      renderEstbDepartureRejoiningReportPdf(doc, submission);
     } else if (isFinanceProcurementRecommendationSanction) {
       renderFinanceProcurementRecommendationSanctionPdf(doc, submission);
     } else if (isComputerCenterFacultyPerforma) {

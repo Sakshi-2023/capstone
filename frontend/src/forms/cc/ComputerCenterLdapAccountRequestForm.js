@@ -158,7 +158,7 @@ const ComputerCenterLdapAccountRequestForm = () => {
           INDIAN INSTITUTE OF TECHNOLOGY PATNA
         </Typography>
         <Box sx={{ mt: 0.6, mb: 1.3, px: 2 }}>
-          <Box sx={{ borderBottom: "4px solid #111", position: "relative", height: 12 }}>
+          <Box sx={{ borderBottom: "4px solid #111", position: "relative", py: 1.2 }}>
             <Box
               sx={{
                 position: "absolute",

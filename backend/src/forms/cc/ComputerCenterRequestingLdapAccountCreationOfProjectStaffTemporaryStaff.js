@@ -1,164 +1,185 @@
 const { getResponseValue, formatDate } = require("../../utils/pdfUtils");
-const pdfStyles = require("../../utils/pdfStyles");
 
 const renderComputerCenterRequestingLdapAccountPdf = (doc, submission) => {
   const responses = submission.responses;
+  const get = (k) => String(getResponseValue(responses, k) || "").trim();
 
-  const empIdProjectId = String(getResponseValue(responses, "empIdProjectId") || "").trim();
-  const fullName = String(getResponseValue(responses, "fullName") || "").trim();
-  const department = String(getResponseValue(responses, "department") || "").trim();
-  const phoneMobileNo = String(getResponseValue(responses, "phoneMobileNo") || "").trim();
-  const personalEmailId = String(getResponseValue(responses, "personalEmailId") || "").trim();
-  const address = String(getResponseValue(responses, "address") || "").trim();
-  const iitpEmailId = String(getResponseValue(responses, "iitpEmailId") || "").trim();
-  const validityLastDate = formatDate(getResponseValue(responses, "validityLastDate"));
-  const requestDate = formatDate(getResponseValue(responses, "requestDate"));
-
-  const leftMargin = doc.page.margins.left;
-  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-
-  const underlineField = (label, value, lineStartX, lineEndX) => {
-    const rowY = doc.y;
-    const lineY = rowY + 14;
-
-    doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text(label, leftMargin, rowY);
-    doc
-      .moveTo(lineStartX, lineY)
-      .lineTo(lineEndX, lineY)
-      .lineWidth(0.5)
-      .stroke();
-
-    if (value) {
-      doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(value, lineStartX + 3, rowY, {
-        width: lineEndX - lineStartX - 6,
-        ellipsis: true,
-      });
-    }
-
-    doc.y = rowY + 24;
+  const data = {
+    empId: get("empIdProjectId"),
+    name: get("fullName"),
+    dept: get("department"),
+    phone: get("phoneMobileNo"),
+    email: get("personalEmailId"),
+    address: get("address"),
+    iitpEmail: get("iitpEmailId"),
+    validity: formatDate(getResponseValue(responses, "validityLastDate")),
+    date: formatDate(getResponseValue(responses, "requestDate")),
   };
 
-  // ── Header ──────────────────────────────────────────────────────────────────
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('TITLE'))
-    .text("INDIAN INSTITUTE OF TECHNOLOGY PATNA", { align: "center" });
+  const x = 50;
+  const width = 500;
+  let y = 50;
 
-  doc.moveDown(0.15);
+  const rowH = 30;
+  const PAD = 6;
 
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('TITLE'))
-    .text("COMPUTER CENTRE", { align: "center" });
+  // ✅ FIXED COLUMN POSITIONS
+  const colA = 40;   // A/B/C
+  const colNum = 40; // 1,2,3...
+  const colLabel = 180;
+  const colValue = width - (colA + colNum + colLabel);
 
-  doc.moveDown(0.2);
+  const xA = x;
+  const xNum = xA + colA;
+  const xLabel = xNum + colNum;
+  const xValue = xLabel + colLabel;
 
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
-    .text("REQUEST / REQUISITION FORM", { align: "center" });
+  const draw = (x, y, w, h) => doc.rect(x, y, w, h).stroke();
 
-  doc
-    .font("Helvetica")
-    .fontSize(pdfStyles.getFontSize('BODY'))
-    .text("(For LDAP Account)", { align: "center" });
+  const text = (t, x, y, bold = false, size = 10, w = null) => {
+    doc.font(bold ? "Helvetica-Bold" : "Helvetica").fontSize(size);
+    doc.text(t, x, y, w ? { width: w } : { lineBreak: false });
+  };
 
-  doc.moveDown(0.9);
+  const centerY = (top, h) => top + h / 2 - 5;
 
-  // ── Section A ───────────────────────────────────────────────────────────────
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
-    .text("A. Personal Information (PLEASE FILL IN BLOCK LETTERS)");
-
-  doc.moveDown(0.5);
-
-  const lineLeft = leftMargin + pageWidth * 0.35;
-  const lineRight = leftMargin + pageWidth;
-
-  underlineField("1. Emp. ID/Project ID", empIdProjectId, lineLeft, lineRight);
-  underlineField("2. Full Name", fullName, lineLeft, lineRight);
-  underlineField("3. Dept./Section/Centre", department, lineLeft, lineRight);
-  underlineField("4. Phone/Mobile No.:", phoneMobileNo, lineLeft, lineRight);
-  underlineField("5. Personal Email-ID", personalEmailId, lineLeft, lineRight);
-  underlineField("6. Address:", address, lineLeft, lineRight);
-
-  // ── Section B ───────────────────────────────────────────────────────────────
-  doc.moveDown(0.2);
-  underlineField("B. IITP Email id (If any):", iitpEmailId, leftMargin + pageWidth * 0.33, lineRight);
-
-  // ── Section C ───────────────────────────────────────────────────────────────
-  doc.moveDown(0.2);
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('SECTION_HEADER'))
-    .text("C. Validity date / Last Date for LDAP account");
-
-  const cValueY = doc.y + 3;
-  const cLineY = cValueY + 15;
-  doc
-    .moveTo(leftMargin, cLineY)
-    .lineTo(leftMargin + pageWidth * 0.55, cLineY)
-    .lineWidth(0.5)
-    .stroke();
-  doc
-    .font("Helvetica")
-    .fontSize(pdfStyles.getFontSize('BODY'))
-    .text(validityLastDate || "", leftMargin + 3, cValueY);
-
-  doc.y = cLineY + 18;
-  doc.moveDown(0.8);
-
-  // ── Signature blocks ────────────────────────────────────────────────────────
-  const sigLineWidth = 210;
-  const rightX = doc.page.width - doc.page.margins.right - sigLineWidth;
-
-  doc
-    .moveTo(leftMargin, doc.y + 12)
-    .lineTo(leftMargin + sigLineWidth, doc.y + 12)
-    .lineWidth(0.5)
-    .stroke();
-
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('LABEL'))
-    .text("SIGNATURE", leftMargin, doc.y + 16);
-
-  const dateTextY = doc.y + 6;
-  doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text("Date:", leftMargin, dateTextY);
-
-  const dateUnderlineY = dateTextY + 13;
-  const dateStartX = leftMargin + doc.widthOfString("Date: ") + 2;
-  doc
-    .moveTo(dateStartX, dateUnderlineY)
-    .lineTo(leftMargin + sigLineWidth, dateUnderlineY)
-    .lineWidth(0.5)
-    .stroke();
-  doc
-    .font("Helvetica")
-    .fontSize(pdfStyles.getFontSize('BODY'))
-    .text(requestDate || "", dateStartX + 2, dateTextY, {
-      width: leftMargin + sigLineWidth - dateStartX - 4,
-      ellipsis: true,
+  // ─── HEADER ─────────────────
+  doc.font("Helvetica-Bold")
+    .fontSize(14)
+    .text("INDIAN INSTITUTE OF TECHNOLOGY PATNA", x, y, {
+      align: "center",
+      width,
     });
 
-  doc.y = dateUnderlineY + 24;
+  y += 20;
 
-  doc
-    .moveTo(rightX, doc.y + 12)
-    .lineTo(rightX + sigLineWidth, doc.y + 12)
-    .lineWidth(0.5)
-    .stroke();
+  // Draw the horizontal line
+  doc.moveTo(x, y).lineTo(x + width, y).stroke();
 
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('LABEL'))
-    .text(
-      "SIGNATURE OF FACULTY (IN-CHARGE)/ HOD",
-      rightX,
-      doc.y + 16,
-      { width: sigLineWidth }
-    );
+  // Draw black label OVER the line (not below it)
+  const boxWidth = 150;
+  const boxHeight = 18;
+  const boxX = x + width - boxWidth;
+  const boxY = y - boxHeight / 2; // 👈 KEY FIX (center on line)
+
+  doc.rect(boxX, boxY, boxWidth, boxHeight).fill("black");
+
+  // Text inside box
+  doc.fillColor("white")
+    .fontSize(10)
+    .text("COMPUTER CENTRE", boxX, boxY + 4, {
+      width: boxWidth,
+      align: "center",
+    });
+
+  doc.fillColor("black"); // reset
+
+  y += 35;
+
+  doc.font("Helvetica-Bold").fontSize(12)
+    .text("REQUEST / REQUISITION FORM", x, y, { align: "center", width });
+
+  doc.font("Helvetica").fontSize(10)
+    .text("(For LDAP Account)", x, y + 15, { align: "center", width });
+
+  y += 40;
+
+  // ─── SECTION A ─────────────────
+  const totalHeight = rowH * 6 + 60;
+
+  // OUTER BOX
+  draw(x, y, width, totalHeight);
+
+  // A column
+  draw(xA, y, colA, totalHeight);
+  text("A.", xA + 12, y + 10, true);
+
+  // header row
+  draw(xNum, y, width - colA, rowH);
+  text("Personal Information (PLEASE FILL IN BLOCK LETTERS)", xNum + PAD, y + 8);
+
+  let yy = y + rowH;
+
+  const rows = [
+    ["1.", "Emp. ID/Project ID", data.empId],
+    ["2.", "Full Name", data.name],
+    ["3.", "Dept./Section/Centre", data.dept],
+    ["4.", "Phone/Mobile No.:", data.phone],
+    ["5.", "Personal Email-ID", data.email],
+  ];
+
+  rows.forEach(([n, l, v]) => {
+    draw(xNum, yy, colNum, rowH);
+    draw(xLabel, yy, colLabel, rowH);
+    draw(xValue, yy, colValue, rowH);
+
+    text(n, xNum + 10, centerY(yy, rowH));
+    text(l, xLabel + PAD, centerY(yy, rowH));
+    text(v, xValue + PAD, centerY(yy, rowH));
+
+    yy += rowH;
+  });
+
+  // ADDRESS
+  const addrH = 60;
+
+  draw(xNum, yy, colNum, addrH);
+  draw(xLabel, yy, colLabel, addrH);
+  draw(xValue, yy, colValue, addrH);
+
+  text("6.", xNum + 10, yy + 10);
+  text("Address:", xLabel + PAD, yy + 10, true);
+  doc.text(data.address, xValue + PAD, yy + 10, { width: colValue - 10 });
+
+  y = yy + addrH;
+
+  // ─── SECTION B ─────────────────
+  draw(xA, y, colA, rowH);
+  draw(xNum, y, colNum + colLabel, rowH);
+  draw(xValue, y, colValue, rowH);
+
+  text("B.", xA + 12, centerY(y, rowH), true);
+  text("IITP Email id (If any):", xNum + PAD, centerY(y, rowH));
+  text(data.iitpEmail, xValue + PAD, centerY(y, rowH));
+
+  y += rowH;
+
+  // ─── SECTION C ─────────────────
+  draw(xA, y, colA, rowH);
+  draw(xNum, y, colNum + colLabel, rowH);
+  draw(xValue, y, colValue, rowH);
+
+  text("C.", xA + 12, centerY(y, rowH), true);
+  text("Validity date / Last Date for LDAP account", xNum + PAD, centerY(y, rowH));
+  text(data.validity, xValue + PAD, centerY(y, rowH));
+
+  y += 60;
+
+  // ─── SIGNATURES ─────────────────
+  const sigW = 180;
+
+  doc.moveTo(x + width - sigW, y)
+     .lineTo(x + width, y)
+     .stroke();
+
+  text("SIGNATURE", x + width - sigW + 40, y + 5, true);
+
+  y += 30;
+
+  text("Date:", x + width - sigW, y);
+  doc.moveTo(x + width - sigW + 40, y + 12)
+     .lineTo(x + width, y + 12)
+     .stroke();
+
+  text(data.date, x + width - sigW + 45, y);
+
+  y += 60;
+
+  doc.moveTo(x, y)
+     .lineTo(x + 220, y)
+     .stroke();
+
+  text("SIGNATURE OF FACULTY (IN-CHARGE)/ HOD", x, y + 5, true);
 };
 
 module.exports = { renderComputerCenterRequestingLdapAccountPdf };

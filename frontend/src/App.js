@@ -15,7 +15,7 @@ import SecurityRequisitionForVehicleSticker from "./forms/security/SecurityRequi
 import SecurityVehicleStickerRequitionForMarriedScholar from "./forms/security/SecurityVehicleStickerRequitionForMarriedScholar";
 import SecurityUndertakingRegardingWorkerConductAndResponsibility from "./forms/security/SecurityUndertakingRegardingWorkerConductAndResponsibility";
 import ComputerCenterLdapAccountRequestForm from "./forms/cc/ComputerCenterLdapAccountRequestForm";
-import EstbDepartureRejoiningReportForm from "./forms/estb/EstbDepartureRejoiningReportForm";import Submissions from "./pages/Submissions";
+import EstbDepartureRejoiningReportForm from "./forms/estb/EstbDepartureRejoiningReportForm";
 import ComputerCenterFacultyPerformaForm from "./forms/cc/ComputerCenterFacultyPerformaForm";
 import ComputerCenterFacultyDeclarationForm from "./forms/cc/ComputerCenterFacultyDeclarationForm";
 import ComputerCenterEmailAccountRequestForm from "./forms/cc/ComputerCenterEmailAccountRequestForm";

@@ -1,130 +1,171 @@
 const { getResponseValue, formatDate } = require("../../utils/pdfUtils");
-const pdfStyles = require("../../utils/pdfStyles");
 
 const renderComputerCenterProxyLdapAccountRequestPdf = (doc, submission) => {
   const responses = submission.responses;
+  const get = (k) => String(getResponseValue(responses, k) || "").trim();
 
-  const studentName = String(getResponseValue(responses, "studentName") || "").trim();
-  const studentRollNo = String(getResponseValue(responses, "studentRollNo") || "").trim();
-  const instituteName = String(getResponseValue(responses, "instituteName") || "").trim();
-  const email = String(getResponseValue(responses, "email") || "").trim();
-  const mobileNo = String(getResponseValue(responses, "mobileNo") || "").trim();
-  const department = String(getResponseValue(responses, "department") || "").trim();
-  const phNo = String(getResponseValue(responses, "phNo") || "").trim();
-  const address = String(getResponseValue(responses, "address") || "").trim();
-  const proxyAccount = String(getResponseValue(responses, "proxyAccount") || "").trim();
-  const lastDayDate = formatDate(getResponseValue(responses, "lastDayDate"));
-  const guideName = String(getResponseValue(responses, "guideName") || "").trim();
-  const guideDesignation = String(getResponseValue(responses, "guideDesignation") || "").trim();
-  const guideDepartment = String(getResponseValue(responses, "guideDepartment") || "").trim();
-  const date = formatDate(getResponseValue(responses, "date"));
-  const place = String(getResponseValue(responses, "place") || "").trim();
-  const studentSignature = String(getResponseValue(responses, "studentSignature") || "").trim();
-  const guideSignature = String(getResponseValue(responses, "guideSignature") || "").trim();
-
-  const leftMargin = doc.page.margins.left;
-  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-
-  const underlineField = (label, value, lineStartX, lineEndX) => {
-    const rowY = doc.y;
-    const lineY = rowY + 14;
-
-    doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text(label, lineStartX, rowY);
-    doc
-      .moveTo(lineStartX + label.length * 7, lineY)
-      .lineTo(lineEndX, lineY)
-      .lineWidth(0.5)
-      .stroke();
-
-    if (value) {
-      doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(value, lineStartX + label.length * 7 + 3, rowY, {
-        width: lineEndX - lineStartX - label.length * 7 - 6,
-        ellipsis: true,
-      });
-    }
-
-    doc.y = rowY + 24;
+  const data = {
+    studentName: get("studentName"),
+    studentRollNo: get("studentRollNo"),
+    instituteName: get("instituteName"),
+    email: get("email"),
+    mobileNo: get("mobileNo"),
+    department: get("department"),
+    phNo: get("phNo"),
+    address: get("address"),
+    proxyAccount: get("proxyAccount"),
+    lastDayDate: formatDate(getResponseValue(responses, "lastDayDate")),
+    guideName: get("guideName"),
+    guideDesignation: get("guideDesignation"),
+    guideDepartment: get("guideDepartment"),
+    date: formatDate(getResponseValue(responses, "date")),
+    place: get("place"),
   };
 
-  // ── Header ──────────────────────────────────────────────────────────────────
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('TITLE'))
-    .text("Requisition Form for Trainee", { align: "center" });
+  const x = 50;
+  const width = 500;
+  let y = 50;
 
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(pdfStyles.getFontSize('SUBTITLE'))
-    .text("Computer Center, IIT Patna", { align: "center" });
+  const rowH = 30;
+  const PAD = 6;
 
-  doc.moveDown(0.5);
+  // ✅ EQUAL COLUMN SPLIT
+  const col = width / 4;
 
-  // ── Header Line ────────────────────────────────────────────────────────────
-  doc.moveTo(leftMargin, doc.y)
-     .lineTo(leftMargin + pageWidth, doc.y)
-     .lineWidth(1)
-     .stroke();
+  const drawCell = (x, y, w, h) => doc.rect(x, y, w, h).stroke();
 
-  doc.moveDown(0.3);
+  const write = (text, x, y, bold = false, size = 10, width = null) => {
+    doc.font(bold ? "Helvetica-Bold" : "Helvetica").fontSize(size);
+    doc.text(text, x, y, width ? { width } : { lineBreak: false });
+  };
 
-  // ── User Information Section ─────────────────────────────────────────────────
-  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("User Information:");
-  
-  underlineField("Student Name:", studentName, leftMargin, leftMargin + 400);
-  underlineField("Student Roll No:", studentRollNo, leftMargin, leftMargin + 400);
-  underlineField("Institute/Organization/College Name:", instituteName, leftMargin, leftMargin + 450);
-  underlineField("Email:", email, leftMargin, leftMargin + 400);
-  underlineField("Mobile No:", mobileNo, leftMargin, leftMargin + 400);
-  underlineField("Department:", department, leftMargin, leftMargin + 400);
-  underlineField("Ph. No:", phNo, leftMargin, leftMargin + 400);
+  const centerY = (top, h) => top + h / 2 - 5;
 
-  // Address field with more space
-  const addressY = doc.y;
-  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("Address:", leftMargin, addressY);
-  doc.moveTo(leftMargin + 60, addressY + 14)
-     .lineTo(leftMargin + 500, addressY + 14)
-     .lineWidth(0.5)
-     .stroke();
-  if (address) {
-    doc.font("Helvetica").fontSize(pdfStyles.getFontSize('BODY')).text(address, leftMargin + 63, addressY, {
-      width: 437,
-      ellipsis: true,
-    });
-  }
-  doc.y = addressY + 40;
+  // ─── HEADER ─────────────────
+  doc.font("Helvetica-Bold").fontSize(16)
+    .text("Requisition Form for Trainee", x, y, { align: "center", width });
 
-  doc.moveDown(0.5);
+  y += 20;
 
-  // ── Proxy Account Requirements Section ─────────────────────────────────────
-  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("Requirements of Proxy Account:");
-  
-  underlineField("Proxy Account:", proxyAccount, leftMargin, leftMargin + 400);
-  underlineField("Last day date:", lastDayDate, leftMargin, leftMargin + 400);
+  doc.font("Helvetica-Bold").fontSize(12)
+    .text("Computer Center, IIT Patna", x, y, { align: "center", width });
 
-  doc.moveDown(0.5);
+  y += 20;
+  doc.moveTo(x, y).lineTo(x + width, y).stroke();
+  y += 20;
 
-  // ── Guide Information Section ───────────────────────────────────────────────
-  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("Guide Information:");
-  
-  underlineField("Guide Name:", guideName, leftMargin, leftMargin + 400);
-  underlineField("Designation:", guideDesignation, leftMargin, leftMargin + 400);
-  underlineField("Department:", guideDepartment, leftMargin, leftMargin + 400);
+  write("User Information:", x, y, true, 11);
+  y += 15;
 
-  doc.moveDown(0.5);
+  // ─── ROW 1 ─────────────────
+  for (let i = 0; i < 4; i++) drawCell(x + i * col, y, col, rowH);
 
-  underlineField("Date:", date, leftMargin, leftMargin + 200);
-  underlineField("Place:", place, leftMargin + 250, leftMargin + 450);
+  write("Student Name:", x + PAD, centerY(y, rowH), true);
+  write(data.studentName, x + col + PAD, centerY(y, rowH), false, 10, col - 10);
 
-  doc.moveDown(0.5);
+  write("Student Roll No.", x + 2 * col + PAD, centerY(y, rowH), true);
+  write(data.studentRollNo, x + 3 * col + PAD, centerY(y, rowH), false, 10, col - 10);
 
-  underlineField("Student Signature:", studentSignature, leftMargin, leftMargin + 400);
+  y += rowH;
 
-  doc.moveDown(1);
+  // ─── FULL WIDTH ROW ─────────────────
+  drawCell(x, y, width, rowH);
+  write("Institute/Organization/College Name:", x + PAD, centerY(y, rowH), true);
+  write(data.instituteName, x + 190, centerY(y, rowH));
 
-  // ── Approval Section ───────────────────────────────────────────────────────
-  doc.font("Helvetica-Bold").fontSize(pdfStyles.getFontSize('LABEL')).text("Approved", { align: "center" });
-  
-  underlineField("(Guide Signature):", guideSignature, leftMargin + 150, leftMargin + 450);
+  y += rowH;
+
+  // ─── EMAIL / MOBILE ─────────────────
+  for (let i = 0; i < 4; i++) drawCell(x + i * col, y, col, rowH);
+
+  write("Email:", x + PAD, centerY(y, rowH), true);
+  write(data.email, x + col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  write("Mobile No:", x + 2 * col + PAD, centerY(y, rowH), true);
+  write(data.mobileNo, x + 3 * col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  y += rowH;
+
+  // ─── DEPARTMENT / PHONE ─────────────────
+  for (let i = 0; i < 4; i++) drawCell(x + i * col, y, col, rowH);
+
+  write("Department:", x + PAD, centerY(y, rowH), true);
+  write(data.department, x + col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  write("Ph. No:", x + 2 * col + PAD, centerY(y, rowH), true);
+  write(data.phNo, x + 3 * col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  y += rowH;
+
+  // ─── ADDRESS ─────────────────
+  const addrH = 70;
+  drawCell(x, y, col, addrH);
+  drawCell(x + col, y, width - col, addrH);
+
+  write("Address:", x + PAD, y + 5, true);
+  doc.text(data.address, x + col + PAD, y + 5, { width: width - col - 10 });
+
+  y += addrH;
+
+  // ─── REQUIREMENTS ─────────────────
+  y += 10;
+  write("Requirements of Proxy Account:", x, y, true);
+  y += 15;
+
+  for (let i = 0; i < 4; i++) drawCell(x + i * col, y, col, rowH);
+
+  write("Proxy Account", x + PAD, centerY(y, rowH), true);
+  write(data.proxyAccount, x + col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  write("Last day date", x + 2 * col + PAD, centerY(y, rowH), true);
+  write(data.lastDayDate, x + 3 * col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  y += rowH;
+
+  // ─── GUIDE INFO ─────────────────
+  y += 10;
+  write("Guide Information:", x, y, true);
+  y += 15;
+
+  for (let i = 0; i < 4; i++) drawCell(x + i * col, y, col, rowH);
+
+  write("Guide Name", x + PAD, centerY(y, rowH), true);
+  write(data.guideName, x + col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  write("Designation", x + 2 * col + PAD, centerY(y, rowH), true);
+  write(data.guideDesignation, x + 3 * col + PAD, centerY(y, rowH), false, 10, col - 10);
+
+  y += rowH;
+
+  drawCell(x, y, col, rowH);
+  drawCell(x + col, y, width - col, rowH);
+
+  write("Department", x + PAD, centerY(y, rowH), true);
+  write(data.guideDepartment, x + col + PAD, centerY(y, rowH));
+
+  y += rowH + 20;
+
+  // ─── DATE + PLACE ─────────────────
+  write("Date:", x, y);
+  doc.moveTo(x + 40, y + 12).lineTo(x + 180, y + 12).stroke();
+  write(data.date, x + 45, y);
+
+  write("Place:", x + 220, y);
+  doc.moveTo(x + 270, y + 12).lineTo(x + 420, y + 12).stroke();
+  write(data.place, x + 275, y);
+
+  y += 80;
+
+  // ─── SIGNATURES (RIGHT SIDE FIXED) ─────────────────
+  write("Student Signature", x + width - 130, y);
+
+  y += 80;
+
+  write("Approved", x + width - 110, y, true);
+
+  y += 30;
+
+  write("(Guide Signature)", x + width - 110, y);
 };
 
 module.exports = { renderComputerCenterProxyLdapAccountRequestPdf };

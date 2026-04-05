@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
 
 const {
   submitForm,
@@ -12,17 +13,21 @@ const {
 
 const protect = require("../middleware/authMiddleware");
 
-// Submit form
-router.post("/", protect, submitForm);
+// Multer — memory storage so we get req.file.buffer
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Submit form (multipart so photo file can be uploaded)
+router.post("/", protect, upload.single("responses[photo]"), submitForm);
 
 // Get my submissions (history)
 router.get("/me", protect, getMySubmissions);
 
+// List submissions pending approval for current user
+// NOTE: must be defined BEFORE /:id to avoid "pending" being treated as an id
+router.get("/pending/list", protect, getPendingApprovals);
+
 // Get single submission (for view / edit-as-new)
 router.get("/:id", protect, getSubmissionById);
-
-// List submissions pending approval for current user
-router.get("/pending/list", protect, getPendingApprovals);
 
 // Approve / reject a submission
 router.post("/:id/act", protect, actOnSubmission);
